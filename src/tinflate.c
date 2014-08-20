@@ -58,9 +58,6 @@ typedef struct {
  * -- uninitialized global data (static structures) -- *
  * --------------------------------------------------- */
 
-TINF_TREE sltree; /* fixed length/symbol tree */
-TINF_TREE sdtree; /* fixed distance tree */
-
 /* extra bits and base tables for length codes */
 unsigned char length_bits[30];
 unsigned short length_base[30];
@@ -369,8 +366,11 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
 /* inflate a block of data compressed with fixed huffman trees */
 static int tinf_inflate_fixed_block(TINF_DATA *d)
 {
+   /* build fixed huffman trees */
+   tinf_build_fixed_trees(&d->ltree, &d->dtree);
+
    /* decode block using fixed trees */
-   return tinf_inflate_block_data(d, &sltree, &sdtree);
+   return tinf_inflate_block_data(d, &d->ltree, &d->dtree);
 }
 
 /* inflate a block of data compressed with dynamic huffman trees */
@@ -390,9 +390,6 @@ static int tinf_inflate_dynamic_block(TINF_DATA *d)
 /* initialize global (static) data */
 void tinf_init()
 {
-   /* build fixed huffman trees */
-   tinf_build_fixed_trees(&sltree, &sdtree);
-
    /* build extra bits and base tables */
    tinf_build_bits_base(length_bits, length_base, 4, 3);
    tinf_build_bits_base(dist_bits, dist_base, 2, 1);
