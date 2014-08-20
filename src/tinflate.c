@@ -215,7 +215,6 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 /* given a data stream, decode dynamic trees from it */
 static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
-   TINF_TREE code_tree;
    unsigned char lengths[288+32];
    unsigned int hlit, hdist, hclen;
    unsigned int i, num, length;
@@ -240,13 +239,13 @@ static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       lengths[clcidx[i]] = clen;
    }
 
-   /* build code length tree */
-   tinf_build_tree(&code_tree, lengths, 19);
+   /* build code length tree, temporarily use length tree */
+   tinf_build_tree(lt, lengths, 19);
 
    /* decode code lengths for the dynamic trees */
    for (num = 0; num < hlit + hdist; )
    {
-      int sym = tinf_decode_symbol(d, &code_tree);
+      int sym = tinf_decode_symbol(d, lt);
 
       switch (sym)
       {
