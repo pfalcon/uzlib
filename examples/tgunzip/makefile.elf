@@ -20,7 +20,7 @@ ldflags = $(cflags)
 
 all: $(target)
 
-$(target): $(objects)
+$(target): $(objects) $(libs)
 	gcc $(ldflags) -o $@ $^ $(libs)
 
 %.o : %.c
