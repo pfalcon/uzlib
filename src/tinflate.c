@@ -58,6 +58,8 @@ typedef struct {
  * -- uninitialized global data (static structures) -- *
  * --------------------------------------------------- */
 
+#ifdef RUNTIME_BITS_TABLES
+
 /* extra bits and base tables for length codes */
 unsigned char length_bits[30];
 unsigned short length_base[30];
@@ -65,6 +67,36 @@ unsigned short length_base[30];
 /* extra bits and base tables for distance codes */
 unsigned char dist_bits[30];
 unsigned short dist_base[30];
+
+#else
+
+const unsigned char length_bits[30] = {
+   0, 0, 0, 0, 0, 0, 0, 0,
+   1, 1, 1, 1, 2, 2, 2, 2,
+   3, 3, 3, 3, 4, 4, 4, 4,
+   5, 5, 5, 5
+};
+const unsigned short length_base[30] = {
+   3, 4, 5, 6, 7, 8, 9, 10,
+   11, 13, 15, 17, 19, 23, 27, 31,
+   35, 43, 51, 59, 67, 83, 99, 115,
+   131, 163, 195, 227, 258
+};
+
+const unsigned char dist_bits[30] = {
+   0, 0, 0, 0, 1, 1, 2, 2,
+   3, 3, 4, 4, 5, 5, 6, 6,
+   7, 7, 8, 8, 9, 9, 10, 10,
+   11, 11, 12, 12, 13, 13
+};
+const unsigned short dist_base[30] = {
+   1, 2, 3, 4, 5, 7, 9, 13,
+   17, 25, 33, 49, 65, 97, 129, 193,
+   257, 385, 513, 769, 1025, 1537, 2049, 3073,
+   4097, 6145, 8193, 12289, 16385, 24577
+};
+
+#endif
 
 /* special ordering of code length codes */
 const unsigned char clcidx[] = {
@@ -77,6 +109,7 @@ const unsigned char clcidx[] = {
  * -- utility functions -- *
  * ----------------------- */
 
+#ifdef RUNTIME_BITS_TABLES
 /* build extra bits and base tables */
 static void tinf_build_bits_base(unsigned char *bits, unsigned short *base, int delta, int first)
 {
@@ -93,6 +126,7 @@ static void tinf_build_bits_base(unsigned char *bits, unsigned short *base, int 
       sum += 1 << bits[i];
    }
 }
+#endif
 
 /* build the fixed huffman trees */
 static void tinf_build_fixed_trees(TINF_TREE *lt, TINF_TREE *dt)
@@ -390,6 +424,7 @@ static int tinf_inflate_dynamic_block(TINF_DATA *d)
 /* initialize global (static) data */
 void tinf_init()
 {
+#ifdef RUNTIME_BITS_TABLES
    /* build extra bits and base tables */
    tinf_build_bits_base(length_bits, length_base, 4, 3);
    tinf_build_bits_base(dist_bits, dist_base, 2, 1);
@@ -397,6 +432,7 @@ void tinf_init()
    /* fix a special case */
    length_bits[28] = 0;
    length_base[28] = 258;
+#endif
 }
 
 /* inflate stream from source to dest */
