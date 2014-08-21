@@ -14,7 +14,7 @@ objects = tgunzip.o
 libs    = ../../lib/libtinf.a
 
 cflags  = -s -Wall -Os -I../../src
-ldflags = $(cflags)
+ldflags = $(cflags) -Wl,-Map,ld.map
 
 .PHONY: all clean
 
