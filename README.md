@@ -1,3 +1,32 @@
+uzlib - Deflate/Zlib-compatible LZ77 compression library
+======================================================
+
+uzlib is a library which can decompress any valid Deflate, Zlib, and Gzip
+(further called just "Deflate") bitstream, and compress data to Deflate-
+compatible bitstream, albeit with lower compression ratio than Zlib Deflate
+algorithm (LZ77 compression is used instead, static Deflate Huffman tree
+encoding is used for bitstream).
+
+uzlib aims for minimal code size and runtime memory requirements, and thus
+suitable for (deeply) embedded systems.
+
+uzlib is based on:
+
+* tinf library by Joergen Ibsen (Deflate decompression)
+* Deflate Static Huffman tree routines by Simon Tatham
+* LZ77 compressor by Paul Sokolovsky
+
+Library integrated and maintained by Paul Sokolovsky.
+
+(c) 2014 Paul Sokolovsky
+
+uzlib library is licensed under Zlib license.
+
+
+The original "tinf" library README follows. NOTE: Some parts may no longer
+apply to uzlib.
+
+
 
 tinf - tiny inflate library
 ===========================
