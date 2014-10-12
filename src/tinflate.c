@@ -33,27 +33,6 @@
 
 #include "tinf.h"
 
-/* ------------------------------ *
- * -- internal data structures -- *
- * ------------------------------ */
-
-typedef struct {
-   unsigned short table[16];  /* table of code length counts */
-   unsigned short trans[288]; /* code -> symbol translation table */
-} TINF_TREE;
-
-typedef struct {
-   const unsigned char *source;
-   unsigned int tag;
-   unsigned int bitcount;
-
-   unsigned char *dest;
-   unsigned int *destLen;
-
-   TINF_TREE ltree; /* dynamic length/symbol tree */
-   TINF_TREE dtree; /* dynamic distance tree */
-} TINF_DATA;
-
 /* --------------------------------------------------- *
  * -- uninitialized global data (static structures) -- *
  * --------------------------------------------------- */
