@@ -36,7 +36,6 @@
 
 #include "tinf.h"
 #include "defl_static.h"
-#include "genlz77.h"
 
 void exit_error(const char *what)
 {

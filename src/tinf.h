@@ -11,6 +11,8 @@
 #ifndef TINF_H_INCLUDED
 #define TINF_H_INCLUDED
 
+#include <stdint.h>
+
 /* calling convention */
 #ifndef TINFCC
  #ifdef __WATCOMC__
@@ -88,6 +90,10 @@ int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
 unsigned int TINFCC tinf_adler32(const void *data, unsigned int length);
 
 unsigned int TINFCC tinf_crc32(const void *data, unsigned int length);
+
+/* compression API */
+
+void TINFCC tinf_compress(void *data, const uint8_t *src, unsigned slen);
 
 #ifdef __cplusplus
 } /* extern "C" */
