@@ -3,8 +3,9 @@
  *
  * Copyright (c) 2003 by Joergen Ibsen / Jibz
  * All Rights Reserved
- *
  * http://www.ibsensoftware.com/
+ *
+ * Copyright (c) 2014 by Paul Sokolovsky
  *
  * This software is provided 'as-is', without any express
  * or implied warranty.  In no event will the authors be

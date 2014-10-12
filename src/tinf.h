@@ -1,12 +1,11 @@
 /*
- * tinf  -  tiny inflate library (inflate, gzip, zlib)
- *
- * version 1.00
+ * uzlib  -  tiny deflate/inflate library (deflate, gzip, zlib)
  *
  * Copyright (c) 2003 by Joergen Ibsen / Jibz
  * All Rights Reserved
- *
  * http://www.ibsensoftware.com/
+ *
+ * Copyright (c) 2014 by Paul Sokolovsky
  */
 
 #ifndef TINF_H_INCLUDED
