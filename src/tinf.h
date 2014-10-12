@@ -27,6 +27,7 @@ extern "C" {
 
 #define TINF_OK             0
 #define TINF_DATA_ERROR    (-3)
+#define TINF_DEST_OVERFLOW (-4)
 
 /* data structures */
 
@@ -59,7 +60,20 @@ typedef struct TINF_DATA {
    TINF_TREE dtree; /* dynamic distance tree */
 } TINF_DATA;
 
-/* function prototypes */
+
+/* low-level API */
+
+/* Step 1: Allocate TINF_DATA structure */
+/* Step 2: Set destStart, destSize, and destGrow fields */
+/* Step 3: Set source field */
+/* Step 4: Call tinf_uncompress_dyn() */
+/* Step 5: In response to destGrow callback, update destStart and destSize fields */
+/* Step 6: When tinf_uncompress_dyn() returns, buf.dest points to a byte past last uncompressed byte */
+
+int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
+int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen);
+
+/* high-level API */
 
 void TINFCC tinf_init();
 

@@ -88,6 +88,21 @@ const unsigned char clcidx[] = {
  * -- utility functions -- *
  * ----------------------- */
 
+/* Execute callback to grow destination buffer */
+static int tinf_grow_dest_buf(TINF_DATA *d, unsigned int lastAlloc)
+{
+   unsigned int oldsize = d->dest - d->destStart;
+   /* This will update only destStart and destSize */
+   if (!d->destGrow)
+   {
+      return TINF_DEST_OVERFLOW;
+   }
+   d->destGrow(d, lastAlloc);
+   d->dest = d->destStart + oldsize;
+   d->destRemaining = d->destSize - oldsize;
+   return 0;
+}
+
 #ifdef RUNTIME_BITS_TABLES
 /* build extra bits and base tables */
 static void tinf_build_bits_base(unsigned char *bits, unsigned short *base, int delta, int first)
@@ -302,9 +317,6 @@ static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 /* given a stream and two trees, inflate a block of data */
 static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
-   /* remember current output position */
-   unsigned char *start = d->dest;
-
    while (1)
    {
       int sym = tinf_decode_symbol(d, lt);
@@ -312,12 +324,17 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       /* check for end of block */
       if (sym == 256)
       {
-         *d->destLen += d->dest - start;
          return TINF_OK;
       }
 
       if (sym < 256)
       {
+         if (d->destRemaining == 0)
+         {
+            int res = tinf_grow_dest_buf(d, 1);
+            if (res) return res;
+         }
+
          *d->dest++ = sym;
 
       } else {
@@ -334,6 +351,12 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 
          /* possibly get more bits from distance code */
          offs = tinf_read_bits(d, dist_bits[dist], dist_base[dist]);
+
+         if (d->destRemaining < length)
+         {
+            int res = tinf_grow_dest_buf(d, length);
+            if (res) return res;
+         }
 
          /* copy match */
          for (i = 0; i < length; ++i)
@@ -363,6 +386,12 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
    /* check length */
    if (length != (~invlength & 0x0000ffff)) return TINF_DATA_ERROR;
 
+   if (d->destRemaining < length)
+   {
+      int res = tinf_grow_dest_buf(d, length);
+      if (res) return res;
+   }
+
    d->source += 4;
 
    /* copy block */
@@ -370,8 +399,6 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
 
    /* make sure we start next block on a byte boundary */
    d->bitcount = 0;
-
-   *d->destLen += length;
 
    return TINF_OK;
 }
@@ -419,16 +446,31 @@ int tinf_uncompress(void *dest, unsigned int *destLen,
                     const void *source, unsigned int sourceLen)
 {
    TINF_DATA d;
-   int bfinal;
+   int res;
 
    /* initialise data */
    d.source = (const unsigned char *)source;
-   d.bitcount = 0;
 
-   d.dest = (unsigned char *)dest;
-   d.destLen = destLen;
+   d.destStart = (unsigned char *)dest;
+   d.destRemaining = *destLen;
 
-   *destLen = 0;
+   res = tinf_uncompress_dyn(&d);
+
+   *destLen = d.dest - d.destStart;
+
+   return res;
+}
+
+/* inflate stream from source to dest */
+int tinf_uncompress_dyn(TINF_DATA *d)
+{
+   int bfinal;
+
+   /* initialise data */
+   d->bitcount = 0;
+
+   d->dest = d->destStart;
+   d->destRemaining = d->destSize;
 
    do {
 
@@ -436,25 +478,25 @@ int tinf_uncompress(void *dest, unsigned int *destLen,
       int res;
 
       /* read final block flag */
-      bfinal = tinf_getbit(&d);
+      bfinal = tinf_getbit(d);
 
       /* read block type (2 bits) */
-      btype = tinf_read_bits(&d, 2, 0);
+      btype = tinf_read_bits(d, 2, 0);
 
       /* decompress block */
       switch (btype)
       {
       case 0:
          /* decompress uncompressed block */
-         res = tinf_inflate_uncompressed_block(&d);
+         res = tinf_inflate_uncompressed_block(d);
          break;
       case 1:
          /* decompress block with fixed huffman trees */
-         res = tinf_inflate_fixed_block(&d);
+         res = tinf_inflate_fixed_block(d);
          break;
       case 2:
          /* decompress block with dynamic huffman trees */
-         res = tinf_inflate_dynamic_block(&d);
+         res = tinf_inflate_dynamic_block(d);
          break;
       default:
          return TINF_DATA_ERROR;
