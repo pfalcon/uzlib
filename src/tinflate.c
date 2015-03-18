@@ -341,8 +341,8 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 
       } else {
 
-         int length, dist, offs;
-         int i;
+         unsigned int length, offs, i;
+         int dist;
 
          sym -= 257;
 
@@ -363,7 +363,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
          /* copy match */
          for (i = 0; i < length; ++i)
          {
-            d->dest[i] = d->dest[i - offs];
+            d->dest[i] = d->dest[(int)(i - offs)];
          }
 
          d->dest += length;
