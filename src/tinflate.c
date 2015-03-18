@@ -432,7 +432,7 @@ static int tinf_inflate_dynamic_block(TINF_DATA *d)
  * ---------------------- */
 
 /* initialize global (static) data */
-void tinf_init()
+void tinf_init(void)
 {
 #ifdef RUNTIME_BITS_TABLES
    /* build extra bits and base tables */
