@@ -449,6 +449,7 @@ void tinf_init(void)
 int tinf_uncompress(void *dest, unsigned int *destLen,
                     const void *source, unsigned int sourceLen)
 {
+   (void)sourceLen;
    TINF_DATA d;
    int res;
 
