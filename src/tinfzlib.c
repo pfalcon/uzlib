@@ -43,7 +43,7 @@ int tinf_zlib_uncompress(void *dest, unsigned int *destLen,
    d.source = (const unsigned char *)source;
 
    d.destStart = (unsigned char *)dest;
-   d.destRemaining = *destLen;
+   d.destSize = *destLen;
 
    res = tinf_zlib_uncompress_dyn(&d, sourceLen);
 
