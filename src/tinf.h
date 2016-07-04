@@ -26,7 +26,10 @@
 extern "C" {
 #endif
 
+/* ok status, more data produced */
 #define TINF_OK             0
+/* end of compressed stream reached */
+#define TINF_DONE           1
 #define TINF_DATA_ERROR    (-3)
 #define TINF_DEST_OVERFLOW (-4)
 
@@ -57,20 +60,32 @@ typedef struct TINF_DATA {
        fail again. */
     int (*destGrow)(struct TINF_DATA *data, unsigned int lastAlloc);
 
+    int btype;
+    int bfinal;
+    unsigned int curlen;
+    int lzOff;
+    unsigned char *dict_ring;
+    unsigned int dict_size;
+    unsigned int dict_idx;
+
    TINF_TREE ltree; /* dynamic length/symbol tree */
    TINF_TREE dtree; /* dynamic distance tree */
 } TINF_DATA;
+
+#define TINF_PUT(d, c) \
+    { *d->dest++ = c; d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; }
 
 
 /* low-level API */
 
 /* Step 1: Allocate TINF_DATA structure */
-/* Step 2: Set destStart, destSize, and destGrow fields */
-/* Step 3: Set source field */
+/* Step 2: Set source field */
+/* Step 3: Call tinf_uncompress_dyn_init() */
 /* Step 4: Call tinf_uncompress_dyn() */
 /* Step 5: In response to destGrow callback, update destStart and destSize fields */
 /* Step 6: When tinf_uncompress_dyn() returns, buf.dest points to a byte past last uncompressed byte */
 
+void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen);
 int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
 int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen);
 
@@ -78,10 +93,10 @@ int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen);
 
 void TINFCC tinf_init(void);
 
-int TINFCC tinf_uncompress(void *dest, unsigned int *destLen,
+int TINFCC tinf_uncompress(TINF_DATA *d, void *dest, unsigned int *destLen,
                            const void *source, unsigned int sourceLen);
 
-int TINFCC tinf_gzip_uncompress(void *dest, unsigned int *destLen,
+int TINFCC tinf_gzip_uncompress(TINF_DATA *d, void *dest, unsigned int *destLen,
                                 const void *source, unsigned int sourceLen);
 
 int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
