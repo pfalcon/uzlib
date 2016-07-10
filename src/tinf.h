@@ -73,7 +73,10 @@ typedef struct TINF_DATA {
 } TINF_DATA;
 
 #define TINF_PUT(d, c) \
-    { *d->dest++ = c; d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; }
+    { \
+        *d->dest++ = c; \
+        if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; } \
+    }
 
 
 /* low-level API */
