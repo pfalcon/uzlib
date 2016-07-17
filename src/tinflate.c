@@ -90,21 +90,6 @@ const unsigned char clcidx[] = {
  * -- utility functions -- *
  * ----------------------- */
 
-/* Execute callback to grow destination buffer */
-static int tinf_grow_dest_buf(TINF_DATA *d, unsigned int lastAlloc)
-{
-   unsigned int oldsize = d->dest - d->destStart;
-   /* This will update only destStart and destSize */
-   if (!d->destGrow)
-   {
-      return TINF_DEST_OVERFLOW;
-   }
-   d->destGrow(d, lastAlloc);
-   d->dest = d->destStart + oldsize;
-   d->destRemaining = d->destSize - oldsize;
-   return 0;
-}
-
 #ifdef RUNTIME_BITS_TABLES
 /* build extra bits and base tables */
 static void tinf_build_bits_base(unsigned char *bits, unsigned short *base, int delta, int first)

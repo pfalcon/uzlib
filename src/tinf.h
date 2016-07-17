@@ -54,11 +54,6 @@ typedef struct TINF_DATA {
     unsigned char *dest;
     /* Remaining bytes in buffer */
     unsigned int destRemaining;
-    /* Argument is the allocation size which didn't fit into buffer. Note that
-       exact mimumum size to grow buffer by is lastAlloc - destRemaining. But
-       growing by this exact size is ineficient, as the next allocation will
-       fail again. */
-    int (*destGrow)(struct TINF_DATA *data, unsigned int lastAlloc);
 
     int btype;
     int bfinal;
