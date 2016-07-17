@@ -39,14 +39,10 @@
 #define FNAME    8
 #define FCOMMENT 16
 
-int tinf_gzip_uncompress(void *dest, unsigned int *destLen,
-                         const void *source, unsigned int sourceLen)
+int tinf_gzip_parse_header(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen)
 {
-    unsigned char *src = (unsigned char *)source;
-    unsigned char *dst = (unsigned char *)dest;
-    unsigned char *start;
-    unsigned int dlen, crc32;
-    int res;
+    const unsigned char *src = *source;
+    const unsigned char *start;
     unsigned char flg;
 
     /* -- check format -- */
@@ -94,31 +90,27 @@ int tinf_gzip_uncompress(void *dest, unsigned int *destLen,
        start += 2;
     }
 
-    /* -- get decompressed length -- */
+    *source = start;
+    return TINF_OK;
+}
 
-    dlen =            src[sourceLen - 1];
-    dlen = 256*dlen + src[sourceLen - 2];
-    dlen = 256*dlen + src[sourceLen - 3];
-    dlen = 256*dlen + src[sourceLen - 4];
+int tinf_gzip_parse_trailer(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen) {
+    unsigned int dlen, crc32;
+    const unsigned char *src = *source;
+
+    dlen =            src[7];
+    dlen = 256*dlen + src[6];
+    dlen = 256*dlen + src[5];
+    dlen = 256*dlen + src[4];
 
     /* -- get crc32 of decompressed data -- */
 
-    crc32 =             src[sourceLen - 5];
-    crc32 = 256*crc32 + src[sourceLen - 6];
-    crc32 = 256*crc32 + src[sourceLen - 7];
-    crc32 = 256*crc32 + src[sourceLen - 8];
+    crc32 =             src[3];
+    crc32 = 256*crc32 + src[2];
+    crc32 = 256*crc32 + src[1];
+    crc32 = 256*crc32 + src[0];
 
-    /* -- decompress data -- */
-
-    res = tinf_uncompress(dst, destLen, start, src + sourceLen - start - 8);
-
-    if (res != TINF_OK) return TINF_DATA_ERROR;
-
-    if (*destLen != dlen) return TINF_DATA_ERROR;
-
-    /* -- check CRC32 checksum -- */
-
-    if (crc32 != tinf_crc32(dst, dlen)) return TINF_DATA_ERROR;
-
+    gz->dlen = dlen;
+    gz->crc32 = crc32;
     return TINF_OK;
 }
