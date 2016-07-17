@@ -421,27 +421,6 @@ void tinf_init(void)
 #endif
 }
 
-/* inflate stream from source to dest */
-int tinf_uncompress(TINF_DATA *d, void *dest, unsigned int *destLen,
-                    const void *source, unsigned int sourceLen)
-{
-   (void)sourceLen;
-   int res;
-
-   /* initialise data */
-   d->source = (const unsigned char *)source;
-
-   d->destStart = (unsigned char *)dest;
-   d->destRemaining = *destLen;
-   d->destSize = *destLen;
-
-   res = tinf_uncompress_dyn(d);
-
-//   *destLen = d.dest - d.destStart;
-
-   return res;
-}
-
 /* initialize decompression structure */
 void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen)
 {

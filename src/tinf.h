@@ -96,9 +96,6 @@ int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen);
 
 void TINFCC tinf_init(void);
 
-int TINFCC tinf_uncompress(TINF_DATA *d, void *dest, unsigned int *destLen,
-                           const void *source, unsigned int sourceLen);
-
 typedef struct TINF_GZIP_INFO {
     unsigned int dlen;
     unsigned int crc32;
