@@ -180,6 +180,11 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
  * -- decode functions -- *
  * ---------------------- */
 
+static unsigned char tinf_read_src_byte(TINF_DATA *d)
+{
+  return *d->source++;
+}
+
 /* get one bit from source stream */
 static int tinf_getbit(TINF_DATA *d)
 {
@@ -189,7 +194,7 @@ static int tinf_getbit(TINF_DATA *d)
    if (!d->bitcount--)
    {
       /* load next tag */
-      d->tag = *d->source++;
+      d->tag = tinf_read_src_byte(d);
       d->bitcount = 7;
    }
 
@@ -379,12 +384,10 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
    unsigned int i;
 
    /* get length */
-   length = d->source[1];
-   length = 256*length + d->source[0];
+   length = tinf_read_src_byte(d) + 256 * tinf_read_src_byte(d);
 
    /* get one's complement of length */
-   invlength = d->source[3];
-   invlength = 256*invlength + d->source[2];
+   invlength = tinf_read_src_byte(d) + 256 * tinf_read_src_byte(d);
 
    /* check length */
    if (length != (~invlength & 0x0000ffff)) return TINF_DATA_ERROR;
@@ -395,10 +398,8 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
       if (res) return res;
    }
 
-   d->source += 4;
-
    /* copy block */
-   for (i = length; i; --i) *d->dest++ = *d->source++;
+   for (i = length; i; --i) *d->dest++ = tinf_read_src_byte(d);
    d->destRemaining -= length;
 
    /* make sure we start next block on a byte boundary */
