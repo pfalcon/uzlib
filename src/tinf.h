@@ -99,8 +99,13 @@ void TINFCC tinf_init(void);
 int TINFCC tinf_uncompress(TINF_DATA *d, void *dest, unsigned int *destLen,
                            const void *source, unsigned int sourceLen);
 
-int TINFCC tinf_gzip_uncompress(TINF_DATA *d, void *dest, unsigned int *destLen,
-                                const void *source, unsigned int sourceLen);
+typedef struct TINF_GZIP_INFO {
+    unsigned int dlen;
+    unsigned int crc32;
+} TINF_GZIP_INFO;
+
+int tinf_gzip_parse_header(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen);
+int tinf_gzip_parse_trailer(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen);
 
 int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
                                 const void *source, unsigned int sourceLen);

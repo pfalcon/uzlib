@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
 {
     FILE *fin, *fout;
     unsigned int len, dlen, outlen;
-    unsigned char *source, *dest;
+    const unsigned char *source;
+    unsigned char *dest;
     int res;
 
     printf("tgunzip - example from the tiny inflate library (www.ibsensoftware.com)\n\n");
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
 
     if (source == NULL) exit_error("memory");
 
-    if (fread(source, 1, len, fin) != len) exit_error("read");
+    if (fread((unsigned char*)source, 1, len, fin) != len) exit_error("read");
 
     fclose(fin);
 
@@ -99,11 +100,42 @@ int main(int argc, char *argv[])
 
     outlen = dlen;
 
-    res = tinf_gzip_uncompress(dest, &outlen, source, len);
+    TINF_DATA d;
+    TINF_GZIP_INFO gz;
 
-    if ((res != TINF_OK) || (outlen != dlen)) exit_error("inflate");
+    res = tinf_gzip_parse_header(&gz, &source, 0);
+    if (res != TINF_OK) {
+        printf("Error parsing header: %d\n", res);
+        exit(1);
+    }
 
-    printf("decompressed %u bytes\n", outlen);
+//    tinf_uncompress_dyn_init(&d, malloc(32768), 32768);
+    tinf_uncompress_dyn_init(&d, NULL, 0);
+    d.source = source;
+
+    d.dest = dest;
+    /* decompress byte by byte; can be any other length */
+    d.destSize = 1;
+
+    do {
+        res = tinf_uncompress_dyn(&d);
+    } while (res == TINF_OK);
+
+    if (res != TINF_DONE) {
+        printf("Error during decompression: %d\n", res);
+    }
+
+    printf("decompressed %lu bytes\n", d.dest - dest);
+
+    res = tinf_gzip_parse_trailer(&gz, &d.source, 0);
+
+    if (d.dest - dest != gz.dlen) {
+        printf("Invalid decompressed length: %lu vs %u\n", d.dest - dest, gz.dlen);
+    }
+
+    if (tinf_crc32(dest, gz.dlen) != gz.crc32) {
+        printf("Invalid decompressed crc32\n");
+    }
 
     /* -- write output -- */
 
