@@ -349,16 +349,25 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         dist = tinf_decode_symbol(d, dt);
         /* possibly get more bits from distance code */
         offs = tinf_read_bits(d, dist_bits[dist], dist_base[dist]);
-        d->lzOff = d->dict_idx - offs;
-        if (d->lzOff < 0) {
-            d->lzOff += d->dict_size;
+        if (d->dict_ring) {
+            d->lzOff = d->dict_idx - offs;
+            if (d->lzOff < 0) {
+                d->lzOff += d->dict_size;
+            }
+        } else {
+            d->lzOff = -offs;
         }
     }
 
     /* copy next byte from dict substring */
-    TINF_PUT(d, d->dict_ring[d->lzOff]);
-    if (++d->lzOff == d->dict_size) {
-        d->lzOff = 0;
+    if (d->dict_ring) {
+        TINF_PUT(d, d->dict_ring[d->lzOff]);
+        if (++d->lzOff == d->dict_size) {
+            d->lzOff = 0;
+        }
+    } else {
+        d->dest[0] = d->dest[d->lzOff];
+        d->dest++;
     }
     d->curlen--;
     return TINF_OK;
