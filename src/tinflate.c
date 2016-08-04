@@ -166,9 +166,12 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
  * -- decode functions -- *
  * ---------------------- */
 
-static unsigned char tinf_read_src_byte(TINF_DATA *d)
+unsigned char tinf_read_src_byte(TINF_DATA *d)
 {
-  return *d->source++;
+    if (d->source) {
+        return *d->source++;
+    }
+    return d->readSource(d);
 }
 
 /* get one bit from source stream */

@@ -43,6 +43,10 @@ typedef struct {
 struct TINF_DATA;
 typedef struct TINF_DATA {
    const unsigned char *source;
+   /* If source above is NULL, this function will be used to read
+      next byte from source stream */
+   unsigned char (*readSource)(struct TINF_DATA *data);
+
    unsigned int tag;
    unsigned int bitcount;
 
