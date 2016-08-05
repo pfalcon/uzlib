@@ -106,7 +106,7 @@ int tinf_gzip_parse_trailer(TINF_GZIP_INFO *gz, const unsigned char **source, un
 int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
                                 const void *source, unsigned int sourceLen);
 
-unsigned int TINFCC tinf_adler32(const void *data, unsigned int length);
+unsigned int TINFCC tinf_adler32(const void *data, unsigned int length, unsigned int prev_sum /* 1 */);
 
 unsigned int TINFCC tinf_crc32(const void *data, unsigned int length);
 
