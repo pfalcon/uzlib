@@ -33,35 +33,14 @@
 
 #include "tinf.h"
 
-int tinf_zlib_uncompress(void *dest, unsigned int *destLen,
-                         const void *source, unsigned int sourceLen)
+int tinf_zlib_parse_header(TINF_DATA *d)
 {
-   TINF_DATA d;
-   int res;
-
-   /* initialise data */
-   d.source = (const unsigned char *)source;
-
-   d.destStart = (unsigned char *)dest;
-   d.destSize = *destLen;
-
-   res = tinf_zlib_uncompress_dyn(&d, sourceLen);
-
-   *destLen = d.dest - d.destStart;
-
-   return res;
-}
-
-int tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen)
-{
-   unsigned int a32;
-   int res;
    unsigned char cmf, flg;
 
    /* -- get header bytes -- */
 
-   cmf = d->source[0];
-   flg = d->source[1];
+   cmf = tinf_read_src_byte(d);
+   flg = tinf_read_src_byte(d);
 
    /* -- check format -- */
 
@@ -77,25 +56,34 @@ int tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen)
    /* check there is no preset dictionary */
    if (flg & 0x20) return TINF_DATA_ERROR;
 
-   /* -- get adler32 checksum -- */
+   /* initialize for adler32 checksum */
+   d->checksum = 1;
 
-   a32 =           d->source[sourceLen - 4];
-   a32 = 256*a32 + d->source[sourceLen - 3];
-   a32 = 256*a32 + d->source[sourceLen - 2];
-   a32 = 256*a32 + d->source[sourceLen - 1];
-
-   d->source += 2;
-
-   /* -- inflate -- */
-
-   res = tinf_uncompress_dyn(d);
-
-   if (res != TINF_OK) return res;
-
-   /* -- check adler32 checksum -- */
-
-   if (a32 != tinf_adler32(d->destStart, d->dest - d->destStart)) return TINF_DATA_ERROR;
-
-   return TINF_OK;
+   return cmf >> 4;
 }
 
+int tinf_zlib_uncompress_dyn(TINF_DATA *d)
+{
+    int res;
+    unsigned char *data = d->dest;
+
+    res = tinf_uncompress_dyn(d);
+
+    if (res < 0) return res;
+
+    d->checksum = tinf_adler32(data, d->dest - data, d->checksum);
+
+    if (res == TINF_DONE) {
+        /* -- get adler32 checksum -- */
+        unsigned int a32 = 0;
+        int i;
+        for (i = 4; i--;) {
+            a32 = a32 << 8 | tinf_read_src_byte(d);
+        }
+        if (d->checksum != a32) {
+            return TINF_DATA_ERROR;
+        }
+    }
+
+    return res;
+}

@@ -59,6 +59,9 @@ typedef struct TINF_DATA {
     /* Remaining bytes in buffer */
     unsigned int destRemaining;
 
+    /* Accumulating checksum */
+    unsigned int checksum;
+
     int btype;
     int bfinal;
     unsigned int curlen;
@@ -89,7 +92,9 @@ typedef struct TINF_DATA {
 
 void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen);
 int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
-int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d, unsigned int sourceLen);
+
+int TINFCC tinf_zlib_parse_header(TINF_DATA *d);
+int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d);
 
 /* high-level API */
 
@@ -103,8 +108,7 @@ typedef struct TINF_GZIP_INFO {
 int tinf_gzip_parse_header(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen);
 int tinf_gzip_parse_trailer(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen);
 
-int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
-                                const void *source, unsigned int sourceLen);
+unsigned char TINFCC tinf_read_src_byte(TINF_DATA *d);
 
 unsigned int TINFCC tinf_adler32(const void *data, unsigned int length, unsigned int prev_sum /* 1 */);
 
