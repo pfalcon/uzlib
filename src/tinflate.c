@@ -174,6 +174,26 @@ unsigned char tinf_read_src_byte(TINF_DATA *d)
     return d->readSource(d);
 }
 
+uint32_t tinf_get_le_uint32(TINF_DATA *d)
+{
+    uint32_t val = 0;
+    int i;
+    for (i = 4; i--;) {
+        val = val >> 8 | tinf_read_src_byte(d) << 24;
+    }
+    return val;
+}
+
+uint32_t tinf_get_be_uint32(TINF_DATA *d)
+{
+    uint32_t val = 0;
+    int i;
+    for (i = 4; i--;) {
+        val = val << 8 | tinf_read_src_byte(d);
+    }
+    return val;
+}
+
 /* get one bit from source stream */
 static int tinf_getbit(TINF_DATA *d)
 {
@@ -476,4 +496,50 @@ next_blk:
     } while (--d->destSize);
 
     return TINF_OK;
+}
+
+int tinf_uncompress_dyn_chksum(TINF_DATA *d)
+{
+    int res;
+    unsigned char *data = d->dest;
+
+    res = tinf_uncompress_dyn(d);
+
+    if (res < 0) return res;
+
+    switch (d->checksum_type) {
+
+    case TINF_CHKSUM_ADLER:
+        d->checksum = tinf_adler32(data, d->dest - data, d->checksum);
+        break;
+
+    case TINF_CHKSUM_CRC:
+        d->checksum = tinf_crc32(data, d->dest - data, d->checksum);
+        break;
+    }
+
+    if (res == TINF_DONE) {
+        unsigned int val;
+
+        switch (d->checksum_type) {
+
+        case TINF_CHKSUM_ADLER:
+            val = tinf_get_be_uint32(d);
+            if (d->checksum != val) {
+                return TINF_CHKSUM_ERROR;
+            }
+            break;
+
+        case TINF_CHKSUM_CRC:
+            val = tinf_get_le_uint32(d);
+            if (~d->checksum != val) {
+                return TINF_CHKSUM_ERROR;
+            }
+            // Uncompressed size. TODO: Check
+            val = tinf_get_le_uint32(d);
+            break;
+        }
+    }
+
+    return res;
 }

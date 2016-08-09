@@ -31,7 +31,12 @@ extern "C" {
 /* end of compressed stream reached */
 #define TINF_DONE           1
 #define TINF_DATA_ERROR    (-3)
-#define TINF_DEST_OVERFLOW (-4)
+#define TINF_CHKSUM_ERROR  (-4)
+
+/* checksum types */
+#define TINF_CHKSUM_NONE  0
+#define TINF_CHKSUM_ADLER 1
+#define TINF_CHKSUM_CRC   2
 
 /* data structures */
 
@@ -61,6 +66,7 @@ typedef struct TINF_DATA {
 
     /* Accumulating checksum */
     unsigned int checksum;
+    char checksum_type;
 
     int btype;
     int bfinal;
@@ -92,27 +98,22 @@ typedef struct TINF_DATA {
 
 void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen);
 int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
+int TINFCC tinf_uncompress_dyn_chksum(TINF_DATA *d);
 
 int TINFCC tinf_zlib_parse_header(TINF_DATA *d);
-int TINFCC tinf_zlib_uncompress_dyn(TINF_DATA *d);
 
 /* high-level API */
 
 void TINFCC tinf_init(void);
 
-typedef struct TINF_GZIP_INFO {
-    unsigned int dlen;
-    unsigned int crc32;
-} TINF_GZIP_INFO;
-
-int tinf_gzip_parse_header(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen);
-int tinf_gzip_parse_trailer(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen);
+int TINFCC tinf_gzip_parse_header(TINF_DATA *d);
 
 unsigned char TINFCC tinf_read_src_byte(TINF_DATA *d);
 
 unsigned int TINFCC tinf_adler32(const void *data, unsigned int length, unsigned int prev_sum /* 1 */);
 
-unsigned int TINFCC tinf_crc32(const void *data, unsigned int length);
+/* crc is previous value for incremental computation, 0xffffffff initially */
+unsigned int TINFCC tinf_crc32(const void *data, unsigned int length, unsigned int crc);
 
 /* compression API */
 

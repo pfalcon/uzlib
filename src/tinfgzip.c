@@ -39,78 +39,67 @@
 #define FNAME    8
 #define FCOMMENT 16
 
-int tinf_gzip_parse_header(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen)
+void tinf_skip_bytes(TINF_DATA *d, int num)
 {
-    const unsigned char *src = *source;
-    const unsigned char *start;
+    while (num--) tinf_read_src_byte(d);
+}
+
+uint16_t tinf_get_uint16(TINF_DATA *d)
+{
+    unsigned int v = tinf_read_src_byte(d);
+    v = (tinf_read_src_byte(d) << 8) | v;
+    return v;
+}
+
+int tinf_gzip_parse_header(TINF_DATA *d)
+{
     unsigned char flg;
 
     /* -- check format -- */
 
     /* check id bytes */
-    if (src[0] != 0x1f || src[1] != 0x8b) return TINF_DATA_ERROR;
+    if (tinf_read_src_byte(d) != 0x1f || tinf_read_src_byte(d) != 0x8b) return TINF_DATA_ERROR;
 
     /* check method is deflate */
-    if (src[2] != 8) return TINF_DATA_ERROR;
+    if (tinf_read_src_byte(d) != 8) return TINF_DATA_ERROR;
 
     /* get flag byte */
-    flg = src[3];
+    flg = tinf_read_src_byte(d);
 
     /* check that reserved bits are zero */
     if (flg & 0xe0) return TINF_DATA_ERROR;
 
     /* -- find start of compressed data -- */
 
-    /* skip base header of 10 bytes */
-    start = src + 10;
+    /* skip rest of base header of 10 bytes */
+    tinf_skip_bytes(d, 6);
 
     /* skip extra data if present */
     if (flg & FEXTRA)
     {
-       unsigned int xlen = start[1];
-       xlen = 256*xlen + start[0];
-       start += xlen + 2;
+       unsigned int xlen = tinf_get_uint16(d);
+       tinf_skip_bytes(d, xlen);
     }
 
     /* skip file name if present */
-    if (flg & FNAME) { while (*start) ++start; ++start; }
+    if (flg & FNAME) { while (tinf_read_src_byte(d)); }
 
     /* skip file comment if present */
-    if (flg & FCOMMENT) { while (*start) ++start; ++start; }
+    if (flg & FCOMMENT) { while (tinf_read_src_byte(d)); }
 
     /* check header crc if present */
     if (flg & FHCRC)
     {
-       unsigned int hcrc = start[1];
-       hcrc = 256*hcrc + start[0];
+       unsigned int hcrc = tinf_get_uint16(d);
 
-       if (hcrc != (tinf_crc32(src, start - src) & 0x0000ffff))
-          return TINF_DATA_ERROR;
-
-       start += 2;
+        // TODO: Check!
+//       if (hcrc != (tinf_crc32(src, start - src) & 0x0000ffff))
+//          return TINF_DATA_ERROR;
     }
 
-    *source = start;
-    return TINF_OK;
-}
+    /* initialize for crc32 checksum */
+    d->checksum_type = TINF_CHKSUM_CRC;
+    d->checksum = ~0;
 
-int tinf_gzip_parse_trailer(TINF_GZIP_INFO *gz, const unsigned char **source, unsigned int sourceLen) {
-    unsigned int dlen, crc32;
-    const unsigned char *src = *source;
-
-    dlen =            src[7];
-    dlen = 256*dlen + src[6];
-    dlen = 256*dlen + src[5];
-    dlen = 256*dlen + src[4];
-
-    /* -- get crc32 of decompressed data -- */
-
-    crc32 =             src[3];
-    crc32 = 256*crc32 + src[2];
-    crc32 = 256*crc32 + src[1];
-    crc32 = 256*crc32 + src[0];
-
-    gz->dlen = dlen;
-    gz->crc32 = crc32;
     return TINF_OK;
 }

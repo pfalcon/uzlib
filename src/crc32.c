@@ -45,13 +45,11 @@ static const unsigned int tinf_crc32tab[16] = {
    0xbdbdf21c
 };
 
-unsigned int tinf_crc32(const void *data, unsigned int length)
+/* crc is previous value for incremental computation, 0xffffffff initially */
+unsigned int tinf_crc32(const void *data, unsigned int length, unsigned int crc)
 {
    const unsigned char *buf = (const unsigned char *)data;
-   unsigned int crc = 0xffffffff;
    unsigned int i;
-
-   if (length == 0) return 0;
 
    for (i = 0; i < length; ++i)
    {
@@ -60,5 +58,6 @@ unsigned int tinf_crc32(const void *data, unsigned int length)
       crc = tinf_crc32tab[crc & 0x0f] ^ (crc >> 4);
    }
 
-   return crc ^ 0xffffffff;
+   // return value suitable for passing in next time, for final value invert it
+   return crc/* ^ 0xffffffff*/;
 }
