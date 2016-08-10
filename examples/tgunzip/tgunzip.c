@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
     outlen = dlen;
 
     TINF_DATA d;
-    TINF_GZIP_INFO gz;
+    d.source = source;
 
-    res = tinf_gzip_parse_header(&gz, &source, 0);
+    res = tinf_gzip_parse_header(&d);
     if (res != TINF_OK) {
         printf("Error parsing header: %d\n", res);
         exit(1);
@@ -111,14 +111,13 @@ int main(int argc, char *argv[])
 
 //    tinf_uncompress_dyn_init(&d, malloc(32768), 32768);
     tinf_uncompress_dyn_init(&d, NULL, 0);
-    d.source = source;
 
     d.dest = dest;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
 
     do {
-        res = tinf_uncompress_dyn(&d);
+        res = tinf_uncompress_dyn_chksum(&d);
     } while (res == TINF_OK);
 
     if (res != TINF_DONE) {
@@ -127,8 +126,7 @@ int main(int argc, char *argv[])
 
     printf("decompressed %lu bytes\n", d.dest - dest);
 
-    res = tinf_gzip_parse_trailer(&gz, &d.source, 0);
-
+#if 0
     if (d.dest - dest != gz.dlen) {
         printf("Invalid decompressed length: %lu vs %u\n", d.dest - dest, gz.dlen);
     }
@@ -136,6 +134,7 @@ int main(int argc, char *argv[])
     if (tinf_crc32(dest, gz.dlen) != gz.crc32) {
         printf("Invalid decompressed crc32\n");
     }
+#endif
 
     /* -- write output -- */
 
