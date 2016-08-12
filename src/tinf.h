@@ -5,7 +5,7 @@
  * All Rights Reserved
  * http://www.ibsensoftware.com/
  *
- * Copyright (c) 2014 by Paul Sokolovsky
+ * Copyright (c) 2014-2016 by Paul Sokolovsky
  */
 
 #ifndef TINF_H_INCLUDED
@@ -86,38 +86,28 @@ typedef struct TINF_DATA {
         if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; } \
     }
 
+unsigned char TINFCC tinf_read_src_byte(TINF_DATA *d);
 
-/* low-level API */
+/* Decompression API */
 
-/* Step 1: Allocate TINF_DATA structure */
-/* Step 2: Set source field */
-/* Step 3: Call tinf_uncompress_dyn_init() */
-/* Step 4: Call tinf_uncompress_dyn() */
-/* Step 5: In response to destGrow callback, update destStart and destSize fields */
-/* Step 6: When tinf_uncompress_dyn() returns, buf.dest points to a byte past last uncompressed byte */
-
-void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen);
+void TINFCC tinf_init(void);
+void TINFCC tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen);
 int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
 int TINFCC tinf_uncompress_dyn_chksum(TINF_DATA *d);
 
 int TINFCC tinf_zlib_parse_header(TINF_DATA *d);
-
-/* high-level API */
-
-void TINFCC tinf_init(void);
-
 int TINFCC tinf_gzip_parse_header(TINF_DATA *d);
 
-unsigned char TINFCC tinf_read_src_byte(TINF_DATA *d);
-
-unsigned int TINFCC tinf_adler32(const void *data, unsigned int length, unsigned int prev_sum /* 1 */);
-
-/* crc is previous value for incremental computation, 0xffffffff initially */
-unsigned int TINFCC tinf_crc32(const void *data, unsigned int length, unsigned int crc);
-
-/* compression API */
+/* Compression API */
 
 void TINFCC tinf_compress(void *data, const uint8_t *src, unsigned slen);
+
+/* Checksum API */
+
+/* prev_sum is previous value for incremental computation, 1 initially */
+uint32_t TINFCC tinf_adler32(const void *data, unsigned int length, uint32_t prev_sum);
+/* crc is previous value for incremental computation, 0xffffffff initially */
+uint32_t TINFCC tinf_crc32(const void *data, unsigned int length, uint32_t crc);
 
 #ifdef __cplusplus
 } /* extern "C" */
