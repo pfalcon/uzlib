@@ -95,8 +95,8 @@ void TINFCC tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dict
 int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
 int TINFCC tinf_uncompress_dyn_chksum(TINF_DATA *d);
 
-int TINFCC tinf_zlib_parse_header(TINF_DATA *d);
-int TINFCC tinf_gzip_parse_header(TINF_DATA *d);
+int TINFCC uzlib_zlib_parse_header(TINF_DATA *d);
+int TINFCC uzlib_gzip_parse_header(TINF_DATA *d);
 
 /* Compression API */
 

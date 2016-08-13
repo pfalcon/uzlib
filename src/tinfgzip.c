@@ -6,6 +6,8 @@
  *
  * http://www.ibsensoftware.com/
  *
+ * Copyright (c) 2014-2016 by Paul Sokolovsky
+ *
  * This software is provided 'as-is', without any express
  * or implied warranty.  In no event will the authors be
  * held liable for any damages arising from the use of
@@ -51,7 +53,7 @@ uint16_t tinf_get_uint16(TINF_DATA *d)
     return v;
 }
 
-int tinf_gzip_parse_header(TINF_DATA *d)
+int uzlib_gzip_parse_header(TINF_DATA *d)
 {
     unsigned char flg;
 

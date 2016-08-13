@@ -6,6 +6,8 @@
  *
  * http://www.ibsensoftware.com/
  *
+ * Copyright (c) 2014-2016 by Paul Sokolovsky
+ *
  * This software is provided 'as-is', without any express
  * or implied warranty.  In no event will the authors be
  * held liable for any damages arising from the use of
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
     TINF_DATA d;
     d.source = source;
 
-    res = tinf_gzip_parse_header(&d);
+    res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
         printf("Error parsing header: %d\n", res);
         exit(1);

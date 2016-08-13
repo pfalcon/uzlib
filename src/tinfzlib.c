@@ -6,6 +6,8 @@
  *
  * http://www.ibsensoftware.com/
  *
+ * Copyright (c) 2014-2016 by Paul Sokolovsky
+ *
  * This software is provided 'as-is', without any express
  * or implied warranty.  In no event will the authors be
  * held liable for any damages arising from the use of
@@ -33,7 +35,7 @@
 
 #include "tinf.h"
 
-int tinf_zlib_parse_header(TINF_DATA *d)
+int uzlib_zlib_parse_header(TINF_DATA *d)
 {
    unsigned char cmf, flg;
 
