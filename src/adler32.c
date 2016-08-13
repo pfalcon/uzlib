@@ -41,7 +41,7 @@
 #define A32_BASE 65521
 #define A32_NMAX 5552
 
-unsigned int tinf_adler32(const void *data, unsigned int length, unsigned int prev_sum /* 1 */)
+unsigned int uzlib_adler32(const void *data, unsigned int length, unsigned int prev_sum /* 1 */)
 {
    const unsigned char *buf = (const unsigned char *)data;
 

@@ -5,7 +5,7 @@
  * All Rights Reserved
  * http://www.ibsensoftware.com/
  *
- * Copyright (c) 2014 by Paul Sokolovsky
+ * Copyright (c) 2014-2016 by Paul Sokolovsky
  *
  * This software is provided 'as-is', without any express
  * or implied warranty.  In no event will the authors be
@@ -416,7 +416,7 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
  * ---------------------- */
 
 /* initialize global (static) data */
-void tinf_init(void)
+void uzlib_init(void)
 {
 #ifdef RUNTIME_BITS_TABLES
    /* build extra bits and base tables */
@@ -430,7 +430,7 @@ void tinf_init(void)
 }
 
 /* initialize decompression structure */
-void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen)
+void uzlib_uncompress_init(TINF_DATA *d, void *dict, unsigned int dictLen)
 {
    d->bitcount = 0;
    d->bfinal = 0;
@@ -442,7 +442,7 @@ void tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen)
 }
 
 /* inflate next byte of compressed stream */
-int tinf_uncompress_dyn(TINF_DATA *d)
+int uzlib_uncompress(TINF_DATA *d)
 {
     do {
         int res;
@@ -498,23 +498,23 @@ next_blk:
     return TINF_OK;
 }
 
-int tinf_uncompress_dyn_chksum(TINF_DATA *d)
+int uzlib_uncompress_chksum(TINF_DATA *d)
 {
     int res;
     unsigned char *data = d->dest;
 
-    res = tinf_uncompress_dyn(d);
+    res = uzlib_uncompress(d);
 
     if (res < 0) return res;
 
     switch (d->checksum_type) {
 
     case TINF_CHKSUM_ADLER:
-        d->checksum = tinf_adler32(data, d->dest - data, d->checksum);
+        d->checksum = uzlib_adler32(data, d->dest - data, d->checksum);
         break;
 
     case TINF_CHKSUM_CRC:
-        d->checksum = tinf_crc32(data, d->dest - data, d->checksum);
+        d->checksum = uzlib_crc32(data, d->dest - data, d->checksum);
         break;
     }
 

@@ -90,10 +90,10 @@ unsigned char TINFCC tinf_read_src_byte(TINF_DATA *d);
 
 /* Decompression API */
 
-void TINFCC tinf_init(void);
-void TINFCC tinf_uncompress_dyn_init(TINF_DATA *d, void *dict, unsigned int dictLen);
-int TINFCC tinf_uncompress_dyn(TINF_DATA *d);
-int TINFCC tinf_uncompress_dyn_chksum(TINF_DATA *d);
+void TINFCC uzlib_init(void);
+void TINFCC uzlib_uncompress_init(TINF_DATA *d, void *dict, unsigned int dictLen);
+int  TINFCC uzlib_uncompress(TINF_DATA *d);
+int  TINFCC uzlib_uncompress_chksum(TINF_DATA *d);
 
 int TINFCC uzlib_zlib_parse_header(TINF_DATA *d);
 int TINFCC uzlib_gzip_parse_header(TINF_DATA *d);
@@ -105,9 +105,9 @@ void TINFCC tinf_compress(void *data, const uint8_t *src, unsigned slen);
 /* Checksum API */
 
 /* prev_sum is previous value for incremental computation, 1 initially */
-uint32_t TINFCC tinf_adler32(const void *data, unsigned int length, uint32_t prev_sum);
+uint32_t TINFCC uzlib_adler32(const void *data, unsigned int length, uint32_t prev_sum);
 /* crc is previous value for incremental computation, 0xffffffff initially */
-uint32_t TINFCC tinf_crc32(const void *data, unsigned int length, uint32_t crc);
+uint32_t TINFCC uzlib_crc32(const void *data, unsigned int length, uint32_t crc);
 
 #ifdef __cplusplus
 } /* extern "C" */

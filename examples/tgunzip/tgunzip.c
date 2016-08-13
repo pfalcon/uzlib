@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
        return 1;
     }
 
-    tinf_init();
+    uzlib_init();
 
     /* -- open files -- */
 
@@ -111,15 +111,15 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-//    tinf_uncompress_dyn_init(&d, malloc(32768), 32768);
-    tinf_uncompress_dyn_init(&d, NULL, 0);
+//    uzlib_uncompress_init(&d, malloc(32768), 32768);
+    uzlib_uncompress_init(&d, NULL, 0);
 
     d.dest = dest;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
 
     do {
-        res = tinf_uncompress_dyn_chksum(&d);
+        res = uzlib_uncompress_chksum(&d);
     } while (res == TINF_OK);
 
     if (res != TINF_DONE) {
