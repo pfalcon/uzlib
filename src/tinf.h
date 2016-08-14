@@ -100,7 +100,7 @@ int TINFCC uzlib_gzip_parse_header(TINF_DATA *d);
 
 /* Compression API */
 
-void TINFCC tinf_compress(void *data, const uint8_t *src, unsigned slen);
+void TINFCC uzlib_compress(void *data, const uint8_t *src, unsigned slen);
 
 /* Checksum API */
 

@@ -85,7 +85,7 @@ static inline void copy(void *data, unsigned offset, unsigned len)
 #endif
 
 
-void tinf_compress(void *data, const uint8_t *src, unsigned slen)
+void uzlib_compress(void *data, const uint8_t *src, unsigned slen)
 {
     const uint8_t *hashtable[HASH_SIZE] = {0};
 

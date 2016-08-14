@@ -2,7 +2,7 @@
  * tgzip  -  gzip compressor example
  *
  * Copyright (c) 2003 by Joergen Ibsen / Jibz
- * Copyright (c) 2014 by Paul Sokolovsky
+ * Copyright (c) 2014-2016 by Paul Sokolovsky
  *
  * http://www.ibsensoftware.com/
  *
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
     struct Outbuf out = {0};
     zlib_start_block(&out);
-    tinf_compress(&out, source, len);
+    uzlib_compress(&out, source, len);
     zlib_finish_block(&out);
 
     printf("compressed to %u raw bytes\n", out.outlen);
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
     fwrite(out.outbuf, 1, out.outlen, fout);
 
-    unsigned crc = tinf_crc32(source, len);
+    unsigned crc = ~uzlib_crc32(source, len, ~0);
     fwrite(&crc, sizeof(crc), 1, fout);
     fwrite(&len, sizeof(len), 1, fout);
 
