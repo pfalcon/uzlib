@@ -41,8 +41,8 @@ int uzlib_zlib_parse_header(TINF_DATA *d)
 
    /* -- get header bytes -- */
 
-   cmf = tinf_read_src_byte(d);
-   flg = tinf_read_src_byte(d);
+   cmf = uzlib_get_byte(d);
+   flg = uzlib_get_byte(d);
 
    /* -- check format -- */
 

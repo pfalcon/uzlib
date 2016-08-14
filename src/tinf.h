@@ -86,7 +86,7 @@ typedef struct TINF_DATA {
         if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; } \
     }
 
-unsigned char TINFCC tinf_read_src_byte(TINF_DATA *d);
+unsigned char TINFCC uzlib_get_byte(TINF_DATA *d);
 
 /* Decompression API */
 

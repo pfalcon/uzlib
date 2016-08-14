@@ -166,7 +166,7 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
  * -- decode functions -- *
  * ---------------------- */
 
-unsigned char tinf_read_src_byte(TINF_DATA *d)
+unsigned char uzlib_get_byte(TINF_DATA *d)
 {
     if (d->source) {
         return *d->source++;
@@ -179,7 +179,7 @@ uint32_t tinf_get_le_uint32(TINF_DATA *d)
     uint32_t val = 0;
     int i;
     for (i = 4; i--;) {
-        val = val >> 8 | tinf_read_src_byte(d) << 24;
+        val = val >> 8 | uzlib_get_byte(d) << 24;
     }
     return val;
 }
@@ -189,7 +189,7 @@ uint32_t tinf_get_be_uint32(TINF_DATA *d)
     uint32_t val = 0;
     int i;
     for (i = 4; i--;) {
-        val = val << 8 | tinf_read_src_byte(d);
+        val = val << 8 | uzlib_get_byte(d);
     }
     return val;
 }
@@ -203,7 +203,7 @@ static int tinf_getbit(TINF_DATA *d)
    if (!d->bitcount--)
    {
       /* load next tag */
-      d->tag = tinf_read_src_byte(d);
+      d->tag = uzlib_get_byte(d);
       d->bitcount = 7;
    }
 
@@ -388,9 +388,9 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
         unsigned int length, invlength;
 
         /* get length */
-        length = tinf_read_src_byte(d) + 256 * tinf_read_src_byte(d);
+        length = uzlib_get_byte(d) + 256 * uzlib_get_byte(d);
         /* get one's complement of length */
-        invlength = tinf_read_src_byte(d) + 256 * tinf_read_src_byte(d);
+        invlength = uzlib_get_byte(d) + 256 * uzlib_get_byte(d);
         /* check length */
         if (length != (~invlength & 0x0000ffff)) return TINF_DATA_ERROR;
 
@@ -406,7 +406,7 @@ static int tinf_inflate_uncompressed_block(TINF_DATA *d)
         return TINF_DONE;
     }
 
-    unsigned char c = tinf_read_src_byte(d);
+    unsigned char c = uzlib_get_byte(d);
     TINF_PUT(d, c);
     return TINF_OK;
 }

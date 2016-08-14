@@ -43,13 +43,13 @@
 
 void tinf_skip_bytes(TINF_DATA *d, int num)
 {
-    while (num--) tinf_read_src_byte(d);
+    while (num--) uzlib_get_byte(d);
 }
 
 uint16_t tinf_get_uint16(TINF_DATA *d)
 {
-    unsigned int v = tinf_read_src_byte(d);
-    v = (tinf_read_src_byte(d) << 8) | v;
+    unsigned int v = uzlib_get_byte(d);
+    v = (uzlib_get_byte(d) << 8) | v;
     return v;
 }
 
@@ -60,13 +60,13 @@ int uzlib_gzip_parse_header(TINF_DATA *d)
     /* -- check format -- */
 
     /* check id bytes */
-    if (tinf_read_src_byte(d) != 0x1f || tinf_read_src_byte(d) != 0x8b) return TINF_DATA_ERROR;
+    if (uzlib_get_byte(d) != 0x1f || uzlib_get_byte(d) != 0x8b) return TINF_DATA_ERROR;
 
     /* check method is deflate */
-    if (tinf_read_src_byte(d) != 8) return TINF_DATA_ERROR;
+    if (uzlib_get_byte(d) != 8) return TINF_DATA_ERROR;
 
     /* get flag byte */
-    flg = tinf_read_src_byte(d);
+    flg = uzlib_get_byte(d);
 
     /* check that reserved bits are zero */
     if (flg & 0xe0) return TINF_DATA_ERROR;
@@ -84,10 +84,10 @@ int uzlib_gzip_parse_header(TINF_DATA *d)
     }
 
     /* skip file name if present */
-    if (flg & FNAME) { while (tinf_read_src_byte(d)); }
+    if (flg & FNAME) { while (uzlib_get_byte(d)); }
 
     /* skip file comment if present */
-    if (flg & FCOMMENT) { while (tinf_read_src_byte(d)); }
+    if (flg & FCOMMENT) { while (uzlib_get_byte(d)); }
 
     /* check header crc if present */
     if (flg & FHCRC)
