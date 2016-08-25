@@ -6,7 +6,7 @@ function test {
 	GZIP_FILE=$INFILE.gz
 	OUTFILE=$FILENAME.out
 
-	COUNT=$RANDOM*100
+	COUNT=$(($RANDOM*100 + $RANDOM))
 	echo "Generating random file, $COUNT bytes"
 
 	#generate a random bytestream
