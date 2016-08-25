@@ -377,9 +377,16 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             d->lzOff = 0;
         }
     } else {
+      if (d->readDest) {
+        //read from destination stream via callback
+        d->dest[0] = d->readDest(d->lzOff);
+      } else {
+        //read from destination stream from memory
         d->dest[0] = d->dest[d->lzOff];
-        d->dest++;
+      }
+      d->dest++;
     }
+
     d->curlen--;
     return TINF_OK;
 }

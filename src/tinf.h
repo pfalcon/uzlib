@@ -64,6 +64,12 @@ typedef struct TINF_DATA {
     /* Remaining bytes in buffer */
     unsigned int destRemaining;
 
+    /* if readDest is provided, it will use this function for
+       reading from the output stream, rather than assuming
+       'dest' contains the entire output stream in memory
+    */
+   unsigned char (*readDest)(int offset);
+
     /* Accumulating checksum */
     unsigned int checksum;
     char checksum_type;
