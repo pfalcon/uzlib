@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
     outlen = 0;
     d.readSource = readSource;
     d.readDest = readDest;
+    d.destSize = 1;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
@@ -124,13 +125,13 @@ int main(int argc, char *argv[])
     /* decompress a single byte at a time */
 
     do {
-        d.destSize = 1;
         d.dest = &dest;
         res = uzlib_uncompress_chksum(&d);
 
+        int written = d.destSize - d.destRemaining;
         //if the destination has been written to, write it out to disk
-        if (d.dest != &dest) {
-            fwrite(&dest, 1, 1, fout);
+        if (written > 0) {
+            fwrite(&dest, 1, written, fout);
             outlen++;
         }
         

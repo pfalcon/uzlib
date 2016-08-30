@@ -503,7 +503,7 @@ next_blk:
             return res;
         }
 
-    } while (--d->destSize);
+    } while (--d->destRemaining);
 
     return TINF_OK;
 }
@@ -512,6 +512,7 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
 {
     int res;
     unsigned char *data = d->dest;
+    d->destRemaining = d->destSize;
 
     res = uzlib_uncompress(d);
 
