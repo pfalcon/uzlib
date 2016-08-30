@@ -34,8 +34,13 @@ function test {
 	rm $OUTFILE	
 }
 
+if [ $# -lt 1 ]; then
+	echo "usage: test.sh <# of runs>"
+	exit 1
+fi
+
 COUNTER=0
-while [  $COUNTER -lt 100 ]; do
+while [  $COUNTER -lt $"1" ]; do
     echo Run $COUNTER
     test
     let COUNTER=COUNTER+1 

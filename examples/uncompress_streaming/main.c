@@ -45,6 +45,8 @@
 
 #include "tinf.h"
 
+#define OUTPUT_BUFFER_SIZE (1)
+
 FILE *fin, *fout;
 
 void exit_error(const char *what)
@@ -106,13 +108,13 @@ int main(int argc, char *argv[])
     if ((fout = fopen(argv[2], "w+")) == NULL) exit_error("destination file");
 
 
-    unsigned char dest;
+    unsigned char output_buffer[OUTPUT_BUFFER_SIZE];
 
     TINF_DATA d;
     outlen = 0;
     d.readSource = readSource;
     d.readDest = readDest;
-    d.destSize = 1;
+    d.destSize = OUTPUT_BUFFER_SIZE;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
@@ -125,14 +127,14 @@ int main(int argc, char *argv[])
     /* decompress a single byte at a time */
 
     do {
-        d.dest = &dest;
+        d.dest = output_buffer;
         res = uzlib_uncompress_chksum(&d);
 
         int written = d.destSize - d.destRemaining;
         //if the destination has been written to, write it out to disk
         if (written > 0) {
-            fwrite(&dest, 1, written, fout);
-            outlen++;
+            fwrite(output_buffer, 1, written, fout);
+            outlen += written;
         }
         
         
