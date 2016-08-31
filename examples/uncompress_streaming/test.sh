@@ -38,6 +38,6 @@ do
   SIZE=`stat -f%z $f`
   echo "Processing $f ($SIZE bytes)"
   test $f
-  # take action on each file. $f store current file name
-  #cat $f
 done
+
+echo "*** Test completed, all passed! ***"
