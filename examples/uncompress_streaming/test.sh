@@ -4,14 +4,23 @@ DATA_DIR=test_data
 
 function test() {
 	INFILE=$1
+    TYPE=$2
 	GZIP_FILE=$INFILE.gz
 	OUTFILE=$FILENAME.out
 
 
 	#compress it
-	gzip -k $INFILE
+	if [ $TYPE == "gzip" ]; then
+		gzip -k $INFILE
+	elif [ $TYPE == "zopfli" ]; then
+		zopfli --i50 -k $INFILE
+	else
+		echo "unknown compression type"
+		exit 1
+	fi
+
     SIZE=`stat -f%z $GZIP_FILE`
-    echo "compressed to $SIZE bytes"
+    echo "$TYPE compressed to $SIZE bytes"
 
 	#decompress it with our app
 	./tgunzip $GZIP_FILE $OUTFILE
@@ -37,7 +46,8 @@ for f in $FILES
 do
   SIZE=`stat -f%z $f`
   echo "Processing $f ($SIZE bytes)"
-  test $f
+  test $f "gzip"
+  test $f "zopfli"
 done
 
 echo "*** Test completed, all passed! ***"
