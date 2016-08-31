@@ -1,22 +1,21 @@
 #!/bin/sh
 
-function test {
-	FILENAME=random
-	INFILE=$FILENAME.bin
+DATA_DIR=test_data
+
+function test() {
+	INFILE=$1
 	GZIP_FILE=$INFILE.gz
 	OUTFILE=$FILENAME.out
 
-	COUNT=$(($RANDOM*100 + $RANDOM))
-	echo "Generating random file, $COUNT bytes"
-
-	#generate a random bytestream
-	dd if=/dev/urandom of=$INFILE bs=1 count=$COUNT
 
 	#compress it
 	gzip -k $INFILE
+    SIZE=`stat -f%z $GZIP_FILE`
+    echo "compressed to $SIZE bytes"
 
 	#decompress it with our app
 	./tgunzip $GZIP_FILE $OUTFILE
+
 
 	#compare original to decompressed file
 	diff $OUTFILE $INFILE
@@ -29,19 +28,16 @@ function test {
 	fi
 
 	#clean up
-	rm $INFILE
 	rm $GZIP_FILE
 	rm $OUTFILE	
 }
 
-if [ $# -lt 1 ]; then
-	echo "usage: test.sh <# of runs>"
-	exit 1
-fi
-
-COUNTER=0
-while [  $COUNTER -lt $"1" ]; do
-    echo Run $COUNTER
-    test
-    let COUNTER=COUNTER+1 
+FILES=$DATA_DIR/*
+for f in $FILES
+do
+  SIZE=`stat -f%z $f`
+  echo "Processing $f ($SIZE bytes)"
+  test $f
+  # take action on each file. $f store current file name
+  #cat $f
 done
