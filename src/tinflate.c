@@ -173,8 +173,11 @@ unsigned char uzlib_get_byte(TINF_DATA *d)
 {
     if (d->source) {
         return *d->source++;
-    }
-    return d->readSource(d);
+    } else {
+      unsigned char out;
+      int ret = d->readSourceByte(d, &out);
+      return out;
+    }    
 }
 
 uint32_t tinf_get_le_uint32(TINF_DATA *d)

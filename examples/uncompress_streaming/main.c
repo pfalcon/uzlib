@@ -79,11 +79,17 @@ static unsigned char readDest(int offset)
   return ret;
 }
 
-static unsigned char readSource(struct TINF_DATA *data)
+/*
+ * readSourceByte - consume and return a byte from the source stream into the argument 'out'.
+ *                  returns 0 on success, or -1 on error.
+ */
+static unsigned int readSourceByte(struct TINF_DATA *data, unsigned char *out)
 {
-  unsigned char ret;
-  if (fread((unsigned char*)&ret, 1, 1, fin) != 1) exit_error("read");
-  return ret;
+  if (fread(out, 1, 1, fin) != 1) {
+    exit_error("read");
+    return -1;
+  }
+  return 0;
 }
 
 int main(int argc, char *argv[])
@@ -112,7 +118,7 @@ int main(int argc, char *argv[])
 
     TINF_DATA d;
     outlen = 0;
-    d.readSource = readSource;
+    d.readSourceByte = readSourceByte;
     d.readDest = readDest;
     d.destSize = OUTPUT_BUFFER_SIZE;
 
