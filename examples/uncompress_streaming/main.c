@@ -160,6 +160,7 @@ int main(int argc, char *argv[])
     do {
         d.dest = &output_buffer[word_position];
         res = uzlib_uncompress_chksum(&d);
+        if (res != TINF_OK) break;
         word_position++;
         //if the destination has been written to, write it out to disk
         if (word_position == 4) {
@@ -177,9 +178,9 @@ int main(int argc, char *argv[])
 
     //write remaining bytes
     printf("word position: %d\n", word_position);
-    fwrite(output_buffer, 1, word_position-1, fout);
+    fwrite(output_buffer, 1, word_position, fout);
 
-    printf("decompressed %d bytes\n", outlen + word_position -1);
+    printf("decompressed %d bytes\n", outlen + word_position);
 
     fclose(fin);
     fclose(fout);
