@@ -55,9 +55,9 @@ void exit_error(const char *what)
    exit(1);
 }
 
-//readDest - read a byte from the decompressed destination file,
-//           at 'offset' from the current position.
-static unsigned char readDest(int offset)
+//readDest - read a byte from the decompressed destination file, at 'offset' from the current position.
+//note: this does not ever write to the output stream; it simply reads from it.
+static unsigned int readDestByte(int offset, unsigned char *out)
 {
   unsigned char ret;
   long last_pos = ftell(fout);
@@ -66,17 +66,23 @@ static unsigned char readDest(int offset)
   if (retval == -1) {
     printf("errno=%s\n", strerror(errno));
     exit_error("fseek pre");
+    return -1;
   }   
 
-  if (fread((unsigned char*)&ret, 1, 1, fout) != 1) exit_error("read");
+  if (fread(&ret, 1, 1, fout) != 1) {
+    exit_error("read");
+    return -1;
+  } 
 
   retval = fseek(fout, last_pos, SEEK_SET);
   if (retval == -1) {
     printf("errno=%s\n", strerror(errno));
     exit_error("fseek post");
+    return -1;
   }   
 
-  return ret;
+  *out = ret;
+  return 0;
 }
 
 /*
@@ -119,7 +125,7 @@ int main(int argc, char *argv[])
     TINF_DATA d;
     outlen = 0;
     d.readSourceByte = readSourceByte;
-    d.readDest = readDest;
+    d.readDestByte = readDestByte;
     d.destSize = OUTPUT_BUFFER_SIZE;
 
     res = uzlib_gzip_parse_header(&d);

@@ -380,9 +380,14 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             d->lzOff = 0;
         }
     } else {
-      if (d->readDest) {
+      if (d->readDestByte) {
         //read from destination stream via callback
-        d->dest[0] = d->readDest(d->lzOff);
+        unsigned char out;
+        int ret = d->readDestByte(d->lzOff, &out);
+        if (ret != 0) {
+          return TINF_DATA_ERROR;
+        }
+        d->dest[0] = out;
       } else {
         //read from destination stream from memory
         d->dest[0] = d->dest[d->lzOff];

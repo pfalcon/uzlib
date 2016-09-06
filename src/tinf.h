@@ -68,7 +68,7 @@ typedef struct TINF_DATA {
        reading from the output stream, rather than assuming
        'dest' contains the entire output stream in memory
     */
-   unsigned char (*readDest)(int offset);
+   unsigned int (*readDestByte)(int offset, unsigned char *out);
 
     /* Accumulating checksum */
     unsigned int checksum;
