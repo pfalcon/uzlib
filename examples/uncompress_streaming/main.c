@@ -66,8 +66,8 @@ static unsigned int readDestByte(int offset, unsigned char *out)
 
   int delta = offset + word_position; //delta between our in memory buffer write position and the desired offset
 
-  printf("offset: %d\n", offset);
-  if ((delta) > 0) {
+  //printf("delta: %d\n", delta);
+  if ((delta) >= 0) {
     //we haven't written word yet, we need to read from word in RAM
     // printf("buff: %02x\r\n", output_buffer[])
     *out = output_buffer[delta];
@@ -85,7 +85,8 @@ static unsigned int readDestByte(int offset, unsigned char *out)
     return -1;
   }   
 
-  if (fread(&ret, 1, 1, fout) != 1) {
+  if (fread(&ret, 1, 1, fout) != 1 && feof(fout) == 0) {
+    //error if we don't read a byte and it's not the end of file
     printf("errno=%s\n", strerror(errno));
     exit_error("read");
     return -1;
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     const unsigned char *source;
     int res;
 
-    printf("tgunzip - example from the tiny inflate library (www.ibsensoftware.com)\n\n");
+    printf("tgunzip\n\n");
 
     if (argc < 3)
     {
@@ -160,7 +161,6 @@ int main(int argc, char *argv[])
         d.dest = &output_buffer[word_position];
         res = uzlib_uncompress_chksum(&d);
         word_position++;
-        printf("%d\r\n", word_position);
         //if the destination has been written to, write it out to disk
         if (word_position == 4) {
             fwrite(output_buffer, 1, 4, fout);
