@@ -69,6 +69,7 @@ typedef struct TINF_DATA {
        'dest' contains the entire output stream in memory
     */
    unsigned int (*readDestByte)(int offset, unsigned char *out);
+   unsigned int (*writeDestWord)(unsigned long data);
 
     /* Accumulating checksum */
     unsigned int checksum;

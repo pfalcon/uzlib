@@ -383,6 +383,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       if (d->readDestByte) {
         //read from destination stream via callback
         unsigned char out;
+        //printf("%d\r\n", d->lzOff);
         int ret = d->readDestByte(d->lzOff, &out);
         if (ret != 0) {
           return TINF_DATA_ERROR;

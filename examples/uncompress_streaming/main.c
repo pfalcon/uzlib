@@ -47,6 +47,10 @@
 
 #define OUTPUT_BUFFER_SIZE (1)
 
+int word_position;  //0-3 (position in RAM word)
+
+unsigned char output_buffer[4];
+
 FILE *fin, *fout;
 
 void exit_error(const char *what)
@@ -59,10 +63,22 @@ void exit_error(const char *what)
 //note: this does not ever write to the output stream; it simply reads from it.
 static unsigned int readDestByte(int offset, unsigned char *out)
 {
+
+  int delta = offset + word_position; //delta between our in memory buffer write position and the desired offset
+
+  printf("offset: %d\n", offset);
+  if ((delta) > 0) {
+    //we haven't written word yet, we need to read from word in RAM
+    // printf("buff: %02x\r\n", output_buffer[])
+    *out = output_buffer[delta];
+    return 0;
+  }
+
+
   unsigned char ret;
   long last_pos = ftell(fout);
 
-  int retval = fseek(fout, offset, SEEK_CUR);
+  int retval = fseek(fout, delta, SEEK_CUR);
   if (retval == -1) {
     printf("errno=%s\n", strerror(errno));
     exit_error("fseek pre");
@@ -70,6 +86,7 @@ static unsigned int readDestByte(int offset, unsigned char *out)
   }   
 
   if (fread(&ret, 1, 1, fout) != 1) {
+    printf("errno=%s\n", strerror(errno));
     exit_error("read");
     return -1;
   } 
@@ -120,13 +137,13 @@ int main(int argc, char *argv[])
     if ((fout = fopen(argv[2], "w+")) == NULL) exit_error("destination file");
 
 
-    unsigned char output_buffer[OUTPUT_BUFFER_SIZE];
+    //unsigned char output_buffer[OUTPUT_BUFFER_SIZE];
 
     TINF_DATA d;
     outlen = 0;
     d.readSourceByte = readSourceByte;
     d.readDestByte = readDestByte;
-    d.destSize = OUTPUT_BUFFER_SIZE;
+    d.destSize = 1;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
@@ -137,16 +154,18 @@ int main(int argc, char *argv[])
     uzlib_uncompress_init(&d, NULL, 0);
 
     /* decompress a single byte at a time */
+    word_position = 0;
 
     do {
-        d.dest = output_buffer;
+        d.dest = &output_buffer[word_position];
         res = uzlib_uncompress_chksum(&d);
-
-        int written = d.destSize - d.destRemaining;
+        word_position++;
+        printf("%d\r\n", word_position);
         //if the destination has been written to, write it out to disk
-        if (written > 0) {
-            fwrite(output_buffer, 1, written, fout);
-            outlen += written;
+        if (word_position == 4) {
+            fwrite(output_buffer, 1, 4, fout);
+            outlen += 4;
+            word_position = 0;
         }
         
         
