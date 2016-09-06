@@ -45,11 +45,10 @@
 
 #include "tinf.h"
 
-#define OUTPUT_BUFFER_SIZE (1)
 
-int word_position;  //0-3 (position in RAM word)
-
-unsigned char output_buffer[4];
+#define OUTPUT_BUFFER_SIZE (4)
+int output_position;  //position in output_buffer
+unsigned char output_buffer[OUTPUT_BUFFER_SIZE];
 
 FILE *fin, *fout;
 
@@ -60,47 +59,54 @@ void exit_error(const char *what)
 }
 
 //readDest - read a byte from the decompressed destination file, at 'offset' from the current position.
+//offset will be the negative offset back into the written output stream.
 //note: this does not ever write to the output stream; it simply reads from it.
 static unsigned int readDestByte(int offset, unsigned char *out)
 {
+  unsigned char data;
 
-  int delta = offset + word_position; //delta between our in memory buffer write position and the desired offset
+  //delta between our position in output_buffer, and the desired offset in the output stream
+  int delta = output_position + offset;
 
-  //printf("delta: %d\n", delta);
-  if ((delta) >= 0) {
-    //we haven't written word yet, we need to read from word in RAM
-    // printf("buff: %02x\r\n", output_buffer[])
-    *out = output_buffer[delta];
-    return 0;
-  }
-
-
-  unsigned char ret;
-  long last_pos = ftell(fout);
-
-  int retval = fseek(fout, delta, SEEK_CUR);
-  if (retval == -1) {
-    printf("errno=%s\n", strerror(errno));
-    exit_error("fseek pre");
-    return -1;
-  }   
-
-  if (fread(&ret, 1, 1, fout) != 1 && feof(fout) == 0) {
-    //error if we don't read a byte and it's not the end of file
-    printf("errno=%s\n", strerror(errno));
-    exit_error("read");
-    return -1;
+  if (delta >= 0) {
+    //we haven't written output_buffer to persistent storage yet; we need to read from output_buffer
+    data = output_buffer[delta];
   } 
 
-  retval = fseek(fout, last_pos, SEEK_SET);
-  if (retval == -1) {
-    printf("errno=%s\n", strerror(errno));
-    exit_error("fseek post");
-    return -1;
-  }   
+  else {
+    //we need to read from persistent storage
 
-  *out = ret;
-  return 0;
+
+    //save where we are in the file
+    long last_pos = ftell(fout);
+
+    //go back to the delta (desired offset from the current position)
+    int retval = fseek(fout, delta, SEEK_CUR);
+    if (retval == -1) {
+      printf("errno=%s\n", strerror(errno));
+      exit_error("fseek pre");
+      return -1;
+    }   
+
+    if (fread(&data, 1, 1, fout) != 1 && feof(fout) == 0) {
+      //error if we don't read a byte and it's not the end of file
+      printf("errno=%s\n", strerror(errno));
+      exit_error("read");
+      return -1;
+    } 
+
+    //go back to where we were, so we can write the next word to the proper position in the stream
+    retval = fseek(fout, last_pos, SEEK_SET);
+    if (retval == -1) {
+      printf("errno=%s\n", strerror(errno));
+      exit_error("fseek post");
+      return -1;
+    }
+  }
+
+    *out = data;
+
+    return 0;  
 }
 
 /*
@@ -155,18 +161,18 @@ int main(int argc, char *argv[])
     uzlib_uncompress_init(&d, NULL, 0);
 
     /* decompress a single byte at a time */
-    word_position = 0;
+    output_position = 0;
 
     do {
-        d.dest = &output_buffer[word_position];
+        d.dest = &output_buffer[output_position];
         res = uzlib_uncompress_chksum(&d);
         if (res != TINF_OK) break;
-        word_position++;
+        output_position++;
         //if the destination has been written to, write it out to disk
-        if (word_position == 4) {
-            fwrite(output_buffer, 1, 4, fout);
-            outlen += 4;
-            word_position = 0;
+        if (output_position == OUTPUT_BUFFER_SIZE) {
+            fwrite(output_buffer, 1, OUTPUT_BUFFER_SIZE, fout);
+            outlen += OUTPUT_BUFFER_SIZE;
+            output_position = 0;
         }
         
         
@@ -177,10 +183,9 @@ int main(int argc, char *argv[])
     }
 
     //write remaining bytes
-    printf("word position: %d\n", word_position);
-    fwrite(output_buffer, 1, word_position, fout);
+    fwrite(output_buffer, 1, output_position, fout);
 
-    printf("decompressed %d bytes\n", outlen + word_position);
+    printf("decompressed %d bytes\n", outlen + output_position);
 
     fclose(fin);
     fclose(fout);

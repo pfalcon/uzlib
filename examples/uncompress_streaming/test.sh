@@ -13,7 +13,7 @@ function test() {
 	if [ $TYPE == "gzip" ]; then
 		gzip -k $INFILE
 	elif [ $TYPE == "zopfli" ]; then
-		zopfli --i50 -k $INFILE
+		zopfli -k $INFILE
 	else
 		echo "unknown compression type"
 		exit 1
