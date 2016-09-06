@@ -175,7 +175,11 @@ int main(int argc, char *argv[])
         printf("Error during decompression: %d\n", res);
     }
 
-    printf("decompressed %d bytes\n", outlen);
+    //write remaining bytes
+    printf("word position: %d\n", word_position);
+    fwrite(output_buffer, 1, word_position-1, fout);
+
+    printf("decompressed %d bytes\n", outlen + word_position -1);
 
     fclose(fin);
     fclose(fout);
