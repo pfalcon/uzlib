@@ -41,6 +41,9 @@
 #define FNAME    8
 #define FCOMMENT 16
 
+void tinf_skip_bytes(TINF_DATA *d, int num);
+uint16_t tinf_get_uint16(TINF_DATA *d);
+
 void tinf_skip_bytes(TINF_DATA *d, int num)
 {
     while (num--) uzlib_get_byte(d);
@@ -92,7 +95,7 @@ int uzlib_gzip_parse_header(TINF_DATA *d)
     /* check header crc if present */
     if (flg & FHCRC)
     {
-       unsigned int hcrc = tinf_get_uint16(d);
+       /*unsigned int hcrc =*/ tinf_get_uint16(d);
 
         // TODO: Check!
 //       if (hcrc != (tinf_crc32(src, start - src) & 0x0000ffff))
