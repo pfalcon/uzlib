@@ -172,6 +172,7 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
 unsigned char uzlib_get_byte(TINF_DATA *d)
 {
     if (d->source) {
+        if(d->source >= d->esource) { d->eof = 1; return 0; }
         return *d->source++;
     }
     return d->readSource(d);
@@ -339,6 +340,8 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         unsigned int offs;
         int dist;
         int sym = tinf_decode_symbol(d, lt);
+        if(d->eof) return TINF_DATA_ERROR;
+
         //printf("huff sym: %02x\n", sym);
 
         /* literal byte */
@@ -371,6 +374,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         } else {
             d->lzOff = -offs;
         }
+        if(d->eof) return TINF_DATA_ERROR;
     }
 
     /* copy next byte from dict substring */
@@ -501,6 +505,7 @@ next_blk:
 
     } while (--d->destSize);
 
+    if (d->eof) return TINF_DATA_ERROR;
     return TINF_OK;
 }
 
@@ -547,5 +552,6 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
         }
     }
 
+    if (d->eof) res = TINF_DATA_ERROR;
     return res;
 }

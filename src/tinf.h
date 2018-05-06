@@ -70,6 +70,7 @@ typedef struct TINF_DATA {
     /* Accumulating checksum */
     unsigned int checksum;
     char checksum_type;
+    char eof;
 
     int btype;
     int bfinal;
