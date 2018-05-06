@@ -545,6 +545,7 @@ next_blk:
 
     } while (--d->destSize);
 
+    if (d->eof) return TINF_DATA_ERROR;
     return TINF_OK;
 }
 
@@ -591,5 +592,6 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
         }
     }
 
+    if (d->eof) res = TINF_DATA_ERROR;
     return res;
 }
