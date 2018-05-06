@@ -74,6 +74,8 @@ typedef struct TINF_DATA {
     unsigned int destSize;
     /* Current pointer in buffer */
     unsigned char *dest;
+   /* end of destination buffer */
+    unsigned char *edest;
 
     /* Accumulating checksum */
     unsigned int checksum;
