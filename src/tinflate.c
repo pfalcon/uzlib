@@ -398,6 +398,10 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         }
     } else {
         if(d->dest >= d->edest) return TINF_DATA_ERROR;
+        if(d->lzOff >= 0) return TINF_DATA_ERROR;
+        // d->dest + d->lzOff >= d->destStart but without undefined behavior due to constructing a pointer to before the d->dest
+        // subtract d->dest from both sides
+        if(d->lzOff < d->destStart - d->dest) return TINF_DATA_ERROR;
         d->dest[0] = d->dest[d->lzOff];
         d->dest++;
     }
