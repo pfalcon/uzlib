@@ -49,6 +49,8 @@ typedef struct {
 struct TINF_DATA;
 typedef struct TINF_DATA {
    const unsigned char *source;
+   /* end of source buffer */
+   const unsigned char *esource;
    /* If source above is NULL, this function will be used to read
       next byte from source stream */
    unsigned char (*readSource)(struct TINF_DATA *data);
@@ -62,6 +64,8 @@ typedef struct TINF_DATA {
     unsigned int destSize;
     /* Current pointer in buffer */
     unsigned char *dest;
+   /* end of destination buffer */
+    unsigned char *edest;
 
     /* Accumulating checksum */
     unsigned int checksum;
