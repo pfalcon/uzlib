@@ -182,7 +182,7 @@ uint32_t tinf_get_le_uint32(TINF_DATA *d)
     uint32_t val = 0;
     int i;
     for (i = 4; i--;) {
-        val = val >> 8 | uzlib_get_byte(d) << 24;
+        val = val >> 8 | ((uint32_t)uzlib_get_byte(d)) << 24;
     }
     return val;
 }
