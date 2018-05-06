@@ -87,6 +87,8 @@ int main(int argc, char *argv[])
 
     fclose(fin);
 
+    if(len < 4) exit_error("impossibly small file");
+
     /* -- get decompressed length -- */
 
     dlen =            source[len - 1];
