@@ -362,9 +362,11 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         /* substring from sliding dictionary */
         sym -= 257;
         /* possibly get more bits from length code */
+        if(sym < 0 || sym >= 30) return TINF_DATA_ERROR;
         d->curlen = tinf_read_bits(d, length_bits[sym], length_base[sym]);
 
         dist = tinf_decode_symbol(d, dt);
+        if(dist < 0 || dist >= 30) return TINF_DATA_ERROR;
         /* possibly get more bits from distance code */
         offs = tinf_read_bits(d, dist_bits[dist], dist_base[dist]);
         if (d->dict_ring) {
