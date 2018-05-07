@@ -245,14 +245,21 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 
       cur = 2*cur + tinf_getbit(d);
 
-      ++len;
+      if (++len == TINF_ARRAY_SIZE(t->table)) {
+         return TINF_DATA_ERROR;
+      }
 
       sum += t->table[len];
       cur -= t->table[len];
 
    } while (cur >= 0);
 
-   return t->trans[sum + cur];
+   sum += cur;
+   if (sum < 0 || sum >= TINF_ARRAY_SIZE(t->trans)) {
+      return TINF_DATA_ERROR;
+   }
+
+   return t->trans[sum];
 }
 
 /* given a data stream, decode dynamic trees from it */
@@ -292,6 +299,9 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       int sym = tinf_decode_symbol(d, lt);
       unsigned char fill_value = 0;
       int lbits, lbase = 3;
+
+      /* error decoding */
+      if (sym < 0) return sym;
 
       switch (sym)
       {
