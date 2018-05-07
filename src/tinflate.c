@@ -246,7 +246,7 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 
       cur = 2*cur + tinf_getbit(d);
 
-      ++len;
+      ++len; if(len == 16) return TINF_DATA_ERROR;
 
       sum += t->table[len];
       cur -= t->table[len];
