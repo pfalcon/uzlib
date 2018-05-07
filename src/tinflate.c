@@ -390,6 +390,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             d->lzOff = 0;
         }
     } else {
+        if(d->dest >= d->edest) return TINF_DATA_ERROR;
         d->dest[0] = d->dest[d->lzOff];
         d->dest++;
     }
