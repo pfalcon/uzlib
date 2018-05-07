@@ -253,7 +253,9 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 
    } while (cur >= 0);
 
-   return t->trans[sum + cur];
+   sum += cur;
+   if(sum < 0 || sum >= 288) return TINF_DATA_ERROR;
+   return t->trans[sum];
 }
 
 /* given a data stream, decode dynamic trees from it */
