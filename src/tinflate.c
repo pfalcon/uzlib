@@ -257,7 +257,7 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 }
 
 /* given a data stream, decode dynamic trees from it */
-static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
+static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
    unsigned char lengths[288+32];
    unsigned int hlit, hdist, hclen;
@@ -290,6 +290,7 @@ static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
    for (num = 0; num < hlit + hdist; )
    {
       int sym = tinf_decode_symbol(d, lt);
+      if(sym < 0) return sym; // i.e., TINF_DATA_ERROR
 
       switch (sym)
       {
@@ -327,6 +328,7 @@ static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
    /* build dynamic trees */
    tinf_build_tree(lt, lengths, hlit);
    tinf_build_tree(dt, lengths + hlit, hdist);
+   return TINF_OK;
 }
 
 /* ----------------------------- *
