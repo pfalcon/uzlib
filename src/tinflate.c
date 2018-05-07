@@ -262,6 +262,7 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
    unsigned char lengths[288+32];
+#define CHECK_INDEX(i) do { int tmp = (i); if(tmp < 0 || tmp >= 288+32) return TINF_DATA_ERROR; } while(0)
    unsigned int hlit, hdist, hclen;
    unsigned int i, num, length;
 
@@ -282,6 +283,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       /* get 3 bits code length (0-7) */
       unsigned int clen = tinf_read_bits(d, 3, 0);
 
+      // clcidx[i] are statically acceptable lengths
       lengths[clcidx[i]] = clen;
    }
 
@@ -299,9 +301,11 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       case 16:
          /* copy previous code length 3-6 times (read 2 bits) */
          {
+            CHECK_INDEX(num - 1);
             unsigned char prev = lengths[num - 1];
             for (length = tinf_read_bits(d, 2, 3); length; --length)
             {
+               CHECK_INDEX(num);
                lengths[num++] = prev;
             }
          }
@@ -310,6 +314,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
          /* repeat code length 0 for 3-10 times (read 3 bits) */
          for (length = tinf_read_bits(d, 3, 3); length; --length)
          {
+            CHECK_INDEX(num);
             lengths[num++] = 0;
          }
          break;
@@ -317,11 +322,13 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
          /* repeat code length 0 for 11-138 times (read 7 bits) */
          for (length = tinf_read_bits(d, 7, 11); length; --length)
          {
+            CHECK_INDEX(num);
             lengths[num++] = 0;
          }
          break;
       default:
          /* values 0-15 represent the actual code lengths */
+         CHECK_INDEX(num);
          lengths[num++] = sym;
          break;
       }
