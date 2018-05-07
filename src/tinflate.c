@@ -476,7 +476,8 @@ next_blk:
                 tinf_build_fixed_trees(&d->ltree, &d->dtree);
             } else if (d->btype == 2) {
                 /* decode trees from stream */
-                tinf_decode_trees(d, &d->ltree, &d->dtree);
+                res = tinf_decode_trees(d, &d->ltree, &d->dtree);
+                if(res != TINF_OK) return res;
             }
         }
 
