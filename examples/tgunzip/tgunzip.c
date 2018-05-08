@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
     }
 
     d.dest = dest;
+    d.edest = dest + dlen;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
 
