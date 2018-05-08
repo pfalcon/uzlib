@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 //    uzlib_uncompress_init(&d, malloc(32768), 32768);
     uzlib_uncompress_init(&d, NULL, 0);
 
-    d.dest = dest;
+    d.dest = d.destStart = dest;
     d.edest = dest + dlen;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
