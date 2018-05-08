@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
 
     TINF_DATA d;
     d.source = source;
+    d.esource = source + len;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
@@ -115,6 +116,7 @@ int main(int argc, char *argv[])
     uzlib_uncompress_init(&d, NULL, 0);
 
     d.dest = dest;
+    d.edest = dest + dlen;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
 
