@@ -87,6 +87,8 @@ int main(int argc, char *argv[])
 
     fclose(fin);
 
+    if(len < 4) exit_error("impossibly small file");
+
     /* -- get decompressed length -- */
 
     dlen =            source[len - 1];
@@ -104,6 +106,7 @@ int main(int argc, char *argv[])
 
     TINF_DATA d;
     d.source = source;
+    d.esource = source + len;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
@@ -114,7 +117,8 @@ int main(int argc, char *argv[])
 //    uzlib_uncompress_init(&d, malloc(32768), 32768);
     uzlib_uncompress_init(&d, NULL, 0);
 
-    d.dest = dest;
+    d.dest = d.destStart = dest;
+    d.edest = dest + dlen;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
 

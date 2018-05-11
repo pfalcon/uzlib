@@ -49,6 +49,8 @@ typedef struct {
 struct TINF_DATA;
 typedef struct TINF_DATA {
    const unsigned char *source;
+   /* end of source buffer */
+   const unsigned char *esource;
    /* If source above is NULL, this function will be used to read
       next byte from source stream */
    unsigned char (*readSource)(struct TINF_DATA *data);
@@ -62,12 +64,13 @@ typedef struct TINF_DATA {
     unsigned int destSize;
     /* Current pointer in buffer */
     unsigned char *dest;
-    /* Remaining bytes in buffer */
-    unsigned int destRemaining;
+   /* end of destination buffer */
+    unsigned char *edest;
 
     /* Accumulating checksum */
     unsigned int checksum;
     char checksum_type;
+    char eof;
 
     int btype;
     int bfinal;
@@ -83,6 +86,7 @@ typedef struct TINF_DATA {
 
 #define TINF_PUT(d, c) \
     { \
+        if(d->dest >= d->edest) return TINF_DATA_ERROR; \
         *d->dest++ = c; \
         if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; } \
     }
