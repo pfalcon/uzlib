@@ -256,10 +256,10 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 }
 
 /* given a data stream, decode dynamic trees from it */
-static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
+static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
    unsigned char lengths[288+32];
-   unsigned int hlit, hdist, hclen;
+   unsigned int hlit, hdist, hclen, hlimit;
    unsigned int i, num, length;
 
    /* get 5 bits HLIT (257-286) */
@@ -286,46 +286,50 @@ static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
    tinf_build_tree(lt, lengths, 19);
 
    /* decode code lengths for the dynamic trees */
-   for (num = 0; num < hlit + hdist; )
+   hlimit = hlit + hdist;
+   for (num = 0; num < hlimit; )
    {
       int sym = tinf_decode_symbol(d, lt);
+      unsigned char fill_value = 0;
+      int lbits, lbase = 3;
 
       switch (sym)
       {
       case 16:
          /* copy previous code length 3-6 times (read 2 bits) */
-         {
-            unsigned char prev = lengths[num - 1];
-            for (length = tinf_read_bits(d, 2, 3); length; --length)
-            {
-               lengths[num++] = prev;
-            }
-         }
+         fill_value = lengths[num - 1];
+         lbits = 2;
          break;
       case 17:
          /* repeat code length 0 for 3-10 times (read 3 bits) */
-         for (length = tinf_read_bits(d, 3, 3); length; --length)
-         {
-            lengths[num++] = 0;
-         }
+         lbits = 3;
          break;
       case 18:
          /* repeat code length 0 for 11-138 times (read 7 bits) */
-         for (length = tinf_read_bits(d, 7, 11); length; --length)
-         {
-            lengths[num++] = 0;
-         }
+         lbits = 7;
+         lbase = 11;
          break;
       default:
          /* values 0-15 represent the actual code lengths */
          lengths[num++] = sym;
-         break;
+         /* continue the for loop */
+         continue;
+      }
+
+      /* special code length 16-18 are handled here */
+      length = tinf_read_bits(d, lbits, lbase);
+      if (num + length >= hlimit) return TINF_DATA_ERROR;
+      for (; length; --length)
+      {
+         lengths[num++] = fill_value;
       }
    }
 
    /* build dynamic trees */
    tinf_build_tree(lt, lengths, hlit);
    tinf_build_tree(dt, lengths + hlit, hdist);
+
+   return TINF_OK;
 }
 
 /* ----------------------------- *
@@ -470,7 +474,10 @@ next_blk:
                 tinf_build_fixed_trees(&d->ltree, &d->dtree);
             } else if (d->btype == 2) {
                 /* decode trees from stream */
-                tinf_decode_trees(d, &d->ltree, &d->dtree);
+                res = tinf_decode_trees(d, &d->ltree, &d->dtree);
+                if (res != TINF_OK) {
+                    return res;
+                }
             }
         }
 
