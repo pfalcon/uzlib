@@ -483,7 +483,7 @@ next_blk:
             break;
         case 1:
         case 2:
-            /* decompress block with fixed/dyanamic huffman trees */
+            /* decompress block with fixed/dynamic huffman trees */
             /* trees were decoded previously, so it's the same routine for both */
             res = tinf_inflate_block_data(d, &d->ltree, &d->dtree);
             break;
