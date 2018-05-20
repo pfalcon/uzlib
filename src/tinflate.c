@@ -315,6 +315,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
    for (num = 0; num < hlimit; )
    {
       int sym = tinf_decode_symbol(d, lt);
+      if (sym < 0) return sym; // e.g., TINF_DATA_ERROR
       unsigned char fill_value = 0;
       int lbits, lbase = 3;
 
