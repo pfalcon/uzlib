@@ -601,3 +601,9 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
 
     return res;
 }
+
+void tinf_put(TINF_DATA *d, char c) {
+    if (d->dest >= d->edest) { d->eof = 1; return; }
+    *d->dest++ = c;
+    if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; }
+}
