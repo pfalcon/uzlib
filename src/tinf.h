@@ -39,6 +39,9 @@ extern "C" {
 #define TINF_CHKSUM_ADLER 1
 #define TINF_CHKSUM_CRC   2
 
+/* helper macros */
+#define TINF_ARRAY_SIZE(arr) (sizeof(arr) / sizeof(*(arr)))
+
 /* data structures */
 
 typedef struct {
