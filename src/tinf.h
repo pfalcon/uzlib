@@ -54,7 +54,7 @@ typedef struct TINF_DATA {
    const unsigned char *source;
    /* If source above is NULL, this function will be used to read
       next byte from source stream */
-   unsigned char (*readSource)(struct TINF_DATA *data);
+   unsigned int (*readSourceByte)(struct TINF_DATA *data, unsigned char *out);
 
    unsigned int tag;
    unsigned int bitcount;
@@ -67,6 +67,13 @@ typedef struct TINF_DATA {
     unsigned char *dest;
     /* Remaining bytes in buffer */
     unsigned int destRemaining;
+
+    /* if readDest is provided, it will use this function for
+       reading from the output stream, rather than assuming
+       'dest' contains the entire output stream in memory
+    */
+   unsigned int (*readDestByte)(int offset, unsigned char *out);
+   unsigned int (*writeDestWord)(unsigned long data);
 
     /* Accumulating checksum */
     unsigned int checksum;

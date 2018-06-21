@@ -173,8 +173,11 @@ unsigned char uzlib_get_byte(TINF_DATA *d)
 {
     if (d->source) {
         return *d->source++;
-    }
-    return d->readSource(d);
+    } else {
+      unsigned char out;
+      int ret = d->readSourceByte(d, &out);
+      return out;
+    }    
 }
 
 uint32_t tinf_get_le_uint32(TINF_DATA *d)
@@ -394,9 +397,22 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             d->lzOff = 0;
         }
     } else {
+      if (d->readDestByte) {
+        //read from destination stream via callback
+        unsigned char out;
+        //printf("%d\r\n", d->lzOff);
+        int ret = d->readDestByte(d->lzOff, &out);
+        if (ret != 0) {
+          return TINF_DATA_ERROR;
+        }
+        d->dest[0] = out;
+      } else {
+        //read from destination stream from memory
         d->dest[0] = d->dest[d->lzOff];
-        d->dest++;
+      }
+      d->dest++;
     }
+
     d->curlen--;
     return TINF_OK;
 }
@@ -518,7 +534,7 @@ next_blk:
             return res;
         }
 
-    } while (--d->destSize);
+    } while (--d->destRemaining);
 
     return TINF_OK;
 }
@@ -527,6 +543,7 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
 {
     int res;
     unsigned char *data = d->dest;
+    d->destRemaining = d->destSize;
 
     res = uzlib_uncompress(d);
 
