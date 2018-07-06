@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    d.dest = dest;
+    d.destStart = d.dest = dest;
     /* decompress byte by byte; can be any other length */
     d.destSize = 1;
 
