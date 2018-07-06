@@ -373,6 +373,10 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         int sym = tinf_decode_symbol(d, lt);
         //printf("huff sym: %02x\n", sym);
 
+        if (d->eof) {
+            return TINF_DATA_ERROR;
+        }
+
         /* literal byte */
         if (sym < 256) {
             TINF_PUT(d, sym);
