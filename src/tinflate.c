@@ -325,6 +325,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       {
       case 16:
          /* copy previous code length 3-6 times (read 2 bits) */
+         if (num == 0) return TINF_DATA_ERROR;
          fill_value = lengths[num - 1];
          lbits = 2;
          break;
