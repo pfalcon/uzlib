@@ -124,6 +124,7 @@ int main(int argc, char *argv[])
 
     if (res != TINF_DONE) {
         printf("Error during decompression: %d\n", res);
+        exit(-res);
     }
 
     printf("decompressed %lu bytes\n", d.dest - dest);
