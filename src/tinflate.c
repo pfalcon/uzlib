@@ -396,15 +396,31 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         dist = tinf_decode_symbol(d, dt);
         /* possibly get more bits from distance code */
         offs = tinf_read_bits(d, dist_bits[dist], dist_base[dist]);
+
+        /* calculate and validate actual LZ offset to use */
         if (d->dict_ring) {
             if (offs > d->dict_size) {
                 return TINF_DICT_ERROR;
             }
+            /* Note: unlike full-dest-in-memory case below, we don't
+               try to catch offset which points to not yet filled
+               part of the dictionary here. Doing so would require
+               keeping another variable to track "filled in" size
+               of the dictionary. Appearance of such an offset cannot
+               lead to accessing memory outside of the dictionary
+               buffer, and clients which don't want to leak unrelated
+               information, should explicitly initialize dictionary
+               buffer passed to uzlib. */
+
             d->lzOff = d->dict_idx - offs;
             if (d->lzOff < 0) {
                 d->lzOff += d->dict_size;
             }
         } else {
+            /* catch trying to point before the start of dest buffer */
+            if (offs > d->dest - d->destStart) {
+                return TINF_DATA_ERROR;
+            }
             d->lzOff = -offs;
         }
     }
