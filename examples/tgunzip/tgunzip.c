@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     uzlib_uncompress_init(&d, NULL, 0);
 
     d.source = source;
+    d.source_limit = source + len - 4;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
