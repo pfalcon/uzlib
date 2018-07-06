@@ -11,7 +11,9 @@
 #ifndef TINF_H_INCLUDED
 #define TINF_H_INCLUDED
 
+#include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /* calling convention */
 #ifndef TINFCC
@@ -51,10 +53,17 @@ typedef struct {
 
 struct TINF_DATA;
 typedef struct TINF_DATA {
+   /* Pointer to the next byte in the input buffer */
    const unsigned char *source;
-   /* If source above is NULL, this function will be used to read
-      next byte from source stream */
-   unsigned char (*readSource)(struct TINF_DATA *data);
+   /* Pointer to the next byte past the input buffer (source_limit = source + len) */
+   const unsigned char *source_limit;
+   /* If source_limit == NULL, or source >= source_limit, this function
+      will be used to read next byte from source stream. The function may
+      also return -1 in
+      case of EOF (or irrecoverable error). Note that besides returning
+      the next byte, it may also update source and sourceRemaining fields,
+      thus allowing for buffered operation. */
+   int (*readSource)(struct TINF_DATA *data);
 
    unsigned int tag;
    unsigned int bitcount;
@@ -71,6 +80,7 @@ typedef struct TINF_DATA {
     /* Accumulating checksum */
     unsigned int checksum;
     char checksum_type;
+    bool eof;
 
     int btype;
     int bfinal;

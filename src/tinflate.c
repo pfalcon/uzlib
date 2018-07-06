@@ -171,10 +171,28 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
 
 unsigned char uzlib_get_byte(TINF_DATA *d)
 {
-    if (d->source) {
+    /* If end of source buffer is not reached, return next byte from source
+       buffer. */
+    if (d->source < d->source_limit) {
         return *d->source++;
     }
-    return d->readSource(d);
+
+    /* Otherwise if there's callback and we haven't seen EOF yet, try to
+       read next byte using it. (Note: the callback can also update ->source
+       and ->source_limit). */
+    if (d->readSource && !d->eof) {
+        int val = d->readSource(d);
+        if (val >= 0) {
+            return (unsigned char)val;
+        }
+    }
+
+    /* Otherwise, we hit EOF (either from ->readSource() or from exhaustion
+       of the buffer), and it will be "sticky", i.e. further calls to this
+       function will end up here too. */
+    d->eof = true;
+
+    return 0;
 }
 
 uint32_t tinf_get_le_uint32(TINF_DATA *d)
@@ -454,6 +472,9 @@ void uzlib_init(void)
 /* initialize decompression structure */
 void uzlib_uncompress_init(TINF_DATA *d, void *dict, unsigned int dictLen)
 {
+   d->eof = 0;
+   d->source_limit = NULL;
+   d->readSource = NULL;
    d->bitcount = 0;
    d->bfinal = 0;
    d->btype = -1;
