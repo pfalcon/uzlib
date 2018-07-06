@@ -405,6 +405,9 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
                 d->lzOff += d->dict_size;
             }
         } else {
+            if (offs > d->dest - d->destStart) {
+                return TINF_DATA_ERROR;
+            }
             d->lzOff = -offs;
         }
     }
