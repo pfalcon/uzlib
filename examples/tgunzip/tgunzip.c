@@ -105,6 +105,9 @@ int main(int argc, char *argv[])
     outlen = dlen;
 
     TINF_DATA d;
+//    uzlib_uncompress_init(&d, malloc(32768), 32768);
+    uzlib_uncompress_init(&d, NULL, 0);
+
     d.source = source;
 
     res = uzlib_gzip_parse_header(&d);
@@ -112,9 +115,6 @@ int main(int argc, char *argv[])
         printf("Error parsing header: %d\n", res);
         exit(1);
     }
-
-//    uzlib_uncompress_init(&d, malloc(32768), 32768);
-    uzlib_uncompress_init(&d, NULL, 0);
 
     d.dest = dest;
     /* decompress byte by byte; can be any other length */
