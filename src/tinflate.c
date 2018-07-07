@@ -272,12 +272,7 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 
    } while (cur >= 0);
 
-   sum += cur;
-   if (sum < 0 || sum >= TINF_ARRAY_SIZE(t->trans)) {
-      return TINF_DATA_ERROR;
-   }
-
-   return t->trans[sum];
+   return t->trans[sum + cur];
 }
 
 /* given a data stream, decode dynamic trees from it */
@@ -315,6 +310,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
    for (num = 0; num < hlimit; )
    {
       int sym = tinf_decode_symbol(d, lt);
+      if (sym < 0) return sym; // e.g., TINF_DATA_ERROR
       unsigned char fill_value = 0;
       int lbits, lbase = 3;
 
@@ -325,6 +321,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       {
       case 16:
          /* copy previous code length 3-6 times (read 2 bits) */
+         if(num-1 >= sizeof(lengths)) return TINF_DATA_ERROR;
          fill_value = lengths[num - 1];
          lbits = 2;
          break;
@@ -416,6 +413,11 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             d->lzOff = 0;
         }
     } else {
+        if(d->dest >= d->edest) return TINF_DATA_ERROR;
+        if(d->lzOff >= 0) return TINF_DATA_ERROR;
+        // d->dest + d->lzOff >= d->destStart but without undefined behavior due to constructing a pointer to before the d->dest
+        // subtract d->dest from both sides
+        if(d->lzOff < d->destStart - d->dest) return TINF_DATA_ERROR;
         d->dest[0] = d->dest[d->lzOff];
         d->dest++;
     }
@@ -545,6 +547,7 @@ next_blk:
 
     } while (--d->destSize);
 
+    if (d->eof) return TINF_DATA_ERROR;
     return TINF_OK;
 }
 
@@ -592,4 +595,10 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
     }
 
     return res;
+}
+
+void tinf_put(TINF_DATA *d, char c) {
+    if (d->dest >= d->edest) { d->eof = 1; return; }
+    *d->dest++ = c;
+    if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; }
 }
