@@ -592,6 +592,5 @@ int uzlib_uncompress_chksum(TINF_DATA *d)
         }
     }
 
-    if (d->eof) res = TINF_DATA_ERROR;
     return res;
 }
