@@ -21,10 +21,10 @@ ldflags = $(cflags) -Wl,-Map,ld.map
 all: $(target)
 
 $(target): $(objects) $(libs)
-	gcc $(ldflags) -o $@ $^ $(libs)
+	$(CC) $(ldflags) -o $@ $^ $(libs)
 
 %.o : %.c
-	gcc $(cflags) -c $<
+	$(CC) $(cflags) -c $<
 
 clean:
 	$(RM) $(objects) $(target)
