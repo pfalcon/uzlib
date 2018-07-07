@@ -38,6 +38,10 @@
 
 #include "tinf.h"
 
+/* produce decompressed output in chunks of this size */
+/* defauly is to decompress byte by byte; can be any other length */
+#define OUT_CHUNK_SIZE 1
+
 void exit_error(const char *what)
 {
    printf("ERROR: %s\n", what);
@@ -118,10 +122,9 @@ int main(int argc, char *argv[])
     }
 
     d.destStart = d.dest = dest;
-    /* decompress byte by byte; can be any other length */
-    d.destSize = 1;
 
     do {
+        d.destSize = OUT_CHUNK_SIZE;
         res = uzlib_uncompress_chksum(&d);
     } while (res == TINF_OK);
 
