@@ -13,8 +13,8 @@ target  = ../lib/libtinf.a
 objects = tinflate.o tinfgzip.o tinfzlib.o adler32.o crc32.o \
     defl_static.o genlz77.o
 
-cflags  = -s -Wall -Os
-ldflags = $(cflags)
+cflags  = -Wall -Os
+ldflags = $(cflags) -s
 
 .PHONY: all clean
 

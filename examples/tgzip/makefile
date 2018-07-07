@@ -13,8 +13,8 @@ target  = tgzip
 objects = tgzip.o
 libs    = ../../lib/libtinf.a
 
-cflags  = -s -Wall -Os -I../../src
-ldflags = $(cflags) -Wl,-Map,ld.map
+cflags  = -Wall -Os -I../../src
+ldflags = $(cflags) -s -Wl,-Map,ld.map
 
 .PHONY: all clean
 
