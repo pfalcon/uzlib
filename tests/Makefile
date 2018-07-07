@@ -1,6 +1,6 @@
 # Very basic smoke test for decompressor
 test:
-	$(MAKE) -C ../src -f makefile.elf
-	$(MAKE) -C ../examples/tgunzip -f makefile.elf
+	$(MAKE) -C ../src
+	$(MAKE) -C ../examples/tgunzip
 	../examples/tgunzip/tgunzip corpus.tar.gz corpus-out.tar
 	md5sum -c corpus.md5sum
