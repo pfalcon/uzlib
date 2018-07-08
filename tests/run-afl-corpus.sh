@@ -1,5 +1,7 @@
 rm -f afl-corpus.log
 
+export LANG=C.UTF-8
+unset LC_COLLATE
 env | grep UBSAN
 
 for f in afl-corpus/*/crashes/*; do
