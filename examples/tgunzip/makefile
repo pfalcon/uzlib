@@ -13,18 +13,18 @@ target  = tgunzip
 objects = tgunzip.o
 libs    = ../../lib/libtinf.a
 
-cflags  = -Wall -Os -I../../src
-ldflags = $(cflags) -s -Wl,-Map,ld.map
+CFLAGS  = -Wall -Os -I../../src
+LDFLAGS = $(CFLAGS) -s -Wl,-Map,ld.map
 
 .PHONY: all clean
 
 all: $(target)
 
 $(target): $(objects) $(libs)
-	$(CC) $(ldflags) -o $@ $^ $(libs)
+	$(CC) $(LDFLAGS) -o $@ $^ $(libs)
 
 %.o : %.c
-	$(CC) $(cflags) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	$(RM) $(objects) $(target)

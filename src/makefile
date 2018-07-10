@@ -13,8 +13,8 @@ target  = ../lib/libtinf.a
 objects = tinflate.o tinfgzip.o tinfzlib.o adler32.o crc32.o \
     defl_static.o genlz77.o
 
-cflags  = -Wall -Os
-ldflags = $(cflags) -s
+CFLAGS  = -Wall -Os
+LDFLAGS = $(CFLAGS) -s
 
 .PHONY: all clean
 
@@ -26,7 +26,7 @@ $(target): $(objects)
 	ranlib $@
 
 %.o : %.c
-	$(CC) $(cflags) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 %.o : %.nas
 	nasm -o $@ -f elf -D_ELF_ -O3 -Inasm/ $<
