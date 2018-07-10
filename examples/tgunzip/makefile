@@ -13,7 +13,8 @@ target  = tgunzip
 objects = tgunzip.o
 libs    = ../../lib/libtinf.a
 
-CFLAGS  = -Wall -Os -I../../src
+COPT    = -Os
+CFLAGS  = -Wall -I../../src $(COPT)
 LDFLAGS = $(CFLAGS) -s -Wl,-Map,ld.map
 
 .PHONY: all clean
