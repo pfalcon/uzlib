@@ -100,13 +100,18 @@ int main(int argc, char *argv[])
     dlen = 256*dlen + source[len - 3];
     dlen = 256*dlen + source[len - 4];
 
+    outlen = dlen;
+
+    /* there can be mismatch between length in the trailer and actual
+       data stream; to avoid buffer overruns on overlong streams, reserve
+       one extra byte */
+    dlen++;
+
     dest = (unsigned char *)malloc(dlen);
 
     if (dest == NULL) exit_error("memory");
 
     /* -- decompress data -- */
-
-    outlen = dlen;
 
     TINF_DATA d;
 //    uzlib_uncompress_init(&d, malloc(32768), 32768);
@@ -123,10 +128,15 @@ int main(int argc, char *argv[])
 
     d.destStart = d.dest = dest;
 
-    do {
-        d.destSize = OUT_CHUNK_SIZE;
+    while (dlen) {
+        unsigned int chunk_len = dlen < OUT_CHUNK_SIZE ? dlen : OUT_CHUNK_SIZE;
+        d.destSize = chunk_len;
         res = uzlib_uncompress_chksum(&d);
-    } while (res == TINF_OK);
+        dlen -= chunk_len;
+        if (res != TINF_OK) {
+            break;
+        }
+    }
 
     if (res != TINF_DONE) {
         printf("Error during decompression: %d\n", res);
