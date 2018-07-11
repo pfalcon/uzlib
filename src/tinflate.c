@@ -365,7 +365,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
  * -- block inflate functions -- *
  * ----------------------------- */
 
-/* given a stream and two trees, inflate a block of data */
+/* given a stream and two trees, inflate next byte of output */
 static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
     if (d->curlen == 0) {
@@ -440,7 +440,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
     return TINF_OK;
 }
 
-/* inflate an uncompressed block of data */
+/* inflate next byte from uncompressed block of data */
 static int tinf_inflate_uncompressed_block(TINF_DATA *d)
 {
     if (d->curlen == 0) {
@@ -505,7 +505,7 @@ void uzlib_uncompress_init(TINF_DATA *d, void *dict, unsigned int dictLen)
    d->curlen = 0;
 }
 
-/* inflate next byte of compressed stream */
+/* inflate next d->destSize output bytes from compressed stream */
 int uzlib_uncompress(TINF_DATA *d)
 {
     do {
@@ -565,6 +565,8 @@ next_blk:
     return TINF_OK;
 }
 
+/* inflate next d->destSize output bytes from compressed stream, updating
+   checksum, and at the end of stream, verify it */
 int uzlib_uncompress_chksum(TINF_DATA *d)
 {
     int res;
