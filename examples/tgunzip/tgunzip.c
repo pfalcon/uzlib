@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "tinf.h"
+#include "uzlib.h"
 
 /* produce decompressed output in chunks of this size */
 /* defauly is to decompress byte by byte; can be any other length */
