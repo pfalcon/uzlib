@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "tinf.h"
+#include "uzlib.h"
 #include "defl_static.h"
 
 void exit_error(const char *what)
