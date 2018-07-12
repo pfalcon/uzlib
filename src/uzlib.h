@@ -61,7 +61,7 @@ typedef struct TINF_DATA {
       will be used to read next byte from source stream. The function may
       also return -1 in
       case of EOF (or irrecoverable error). Note that besides returning
-      the next byte, it may also update source and sourceRemaining fields,
+      the next byte, it may also update source and source_limit fields,
       thus allowing for buffered operation. */
    int (*readSource)(struct TINF_DATA *data);
 
