@@ -67,9 +67,9 @@ struct uzlib_uncomp {
     unsigned int bitcount;
 
     /* Buffer start */
-    unsigned char *destStart;
+    unsigned char *dest_start;
     /* Remaining bytes in buffer */
-    unsigned int destSize;
+    unsigned int dest_size;
     /* Current pointer in buffer */
     unsigned char *dest;
 

@@ -3,3 +3,6 @@
    to be removed in the future, so applications should migrate to new
    uzlib API. */
 #define TINF_DATA struct uzlib_uncomp
+
+#define destSize dest_size
+#define destStart dest_start
