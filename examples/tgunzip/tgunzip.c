@@ -117,8 +117,10 @@ int main(int argc, char *argv[])
 //    uzlib_uncompress_init(&d, malloc(32768), 32768);
     uzlib_uncompress_init(&d, NULL, 0);
 
+    /* all 3 fields below must be initialized by user */
     d.source = source;
     d.source_limit = source + len - 4;
+    d.source_read_cb = NULL;
 
     res = uzlib_gzip_parse_header(&d);
     if (res != TINF_OK) {
