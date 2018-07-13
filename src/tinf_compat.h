@@ -6,3 +6,4 @@
 
 #define destSize dest_size
 #define destStart dest_start
+#define readSource source_read_cb
