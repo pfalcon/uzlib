@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 
     /* -- decompress data -- */
 
-    TINF_DATA d;
+    struct uzlib_uncomp d;
 //    uzlib_uncompress_init(&d, malloc(32768), 32768);
     uzlib_uncompress_init(&d, NULL, 0);
 
@@ -128,11 +128,11 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    d.destStart = d.dest = dest;
+    d.dest_start = d.dest = dest;
 
     while (dlen) {
         unsigned int chunk_len = dlen < OUT_CHUNK_SIZE ? dlen : OUT_CHUNK_SIZE;
-        d.destSize = chunk_len;
+        d.dest_size = chunk_len;
         res = uzlib_uncompress_chksum(&d);
         dlen -= chunk_len;
         if (res != TINF_OK) {
