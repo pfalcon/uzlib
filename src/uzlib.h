@@ -51,22 +51,20 @@ typedef struct {
    unsigned short trans[288]; /* code -> symbol translation table */
 } TINF_TREE;
 
-struct TINF_DATA;
-typedef struct TINF_DATA {
-   /* Pointer to the next byte in the input buffer */
-   const unsigned char *source;
-   /* Pointer to the next byte past the input buffer (source_limit = source + len) */
-   const unsigned char *source_limit;
-   /* If source_limit == NULL, or source >= source_limit, this function
-      will be used to read next byte from source stream. The function may
-      also return -1 in
-      case of EOF (or irrecoverable error). Note that besides returning
-      the next byte, it may also update source and source_limit fields,
-      thus allowing for buffered operation. */
-   int (*readSource)(struct TINF_DATA *data);
+struct uzlib_uncomp {
+    /* Pointer to the next byte in the input buffer */
+    const unsigned char *source;
+    /* Pointer to the next byte past the input buffer (source_limit = source + len) */
+    const unsigned char *source_limit;
+    /* If source_limit == NULL, or source >= source_limit, this function
+       will be used to read next byte from source stream. The function may
+       also return -1 in case of EOF (or irrecoverable error). Note that
+       besides returning the next byte, it may also update source and
+       source_limit fields, thus allowing for buffered operation. */
+    int (*readSource)(struct uzlib_uncomp *uncomp);
 
-   unsigned int tag;
-   unsigned int bitcount;
+    unsigned int tag;
+    unsigned int bitcount;
 
     /* Buffer start */
     unsigned char *destStart;
@@ -88,9 +86,11 @@ typedef struct TINF_DATA {
     unsigned int dict_size;
     unsigned int dict_idx;
 
-   TINF_TREE ltree; /* dynamic length/symbol tree */
-   TINF_TREE dtree; /* dynamic distance tree */
-} TINF_DATA;
+    TINF_TREE ltree; /* dynamic length/symbol tree */
+    TINF_TREE dtree; /* dynamic distance tree */
+};
+
+#include "tinf_compat.h"
 
 #define TINF_PUT(d, c) \
     { \
