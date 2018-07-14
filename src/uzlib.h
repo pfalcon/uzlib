@@ -16,6 +16,9 @@
 #include <stdbool.h>
 
 #include "uzlib_conf.h"
+#if UZLIB_CONF_DEBUG_LOG
+#include <stdio.h>
+#endif
 
 /* calling convention */
 #ifndef TINFCC

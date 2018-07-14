@@ -525,7 +525,9 @@ next_blk:
             /* read block type (2 bits) */
             d->btype = tinf_read_bits(d, 2, 0);
 
-            //printf("Started new block: type=%d final=%d\n", d->btype, d->bfinal);
+            #if UZLIB_CONF_DEBUG_LOG >= 1
+            printf("Started new block: type=%d final=%d\n", d->btype, d->bfinal);
+            #endif
 
             if (d->btype == 1) {
                 /* build fixed huffman trees */
