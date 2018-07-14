@@ -162,6 +162,9 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
    UZLIB_DUMP_ARRAY("codelen counts:", t->table, TINF_ARRAY_SIZE(t->table));
    #endif
 
+   /* In the lengths array, 0 means unused code. So, t->table[0] now contains
+      number of unused codes. But table's purpose is to contain # of codes of
+      particular length, and there're 0 codes of length 0. */
    t->table[0] = 0;
 
    /* compute offset table for distribution sort */
