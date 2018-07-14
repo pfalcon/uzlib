@@ -4,8 +4,8 @@ uzlib - Deflate/Zlib-compatible LZ77 compression/decompression library
 uzlib is a library which can decompress any valid Deflate, Zlib, and Gzip
 (further called just "Deflate") bitstream, and compress data to Deflate-
 compatible bitstream, albeit with lower compression ratio than Zlib Deflate
-algorithm (LZ77 compression is used instead, static Deflate Huffman tree
-encoding is used for bitstream).
+algorithm (very basic LZ77 compression algorithm is used instead, static
+Deflate Huffman tree encoding is used for bitstream).
 
 uzlib aims for minimal code size and runtime memory requirements, and thus
 suitable for (deeply) embedded systems.
