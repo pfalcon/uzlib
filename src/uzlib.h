@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "uzlib_conf.h"
+
 /* calling convention */
 #ifndef TINFCC
  #ifdef __WATCOMC__
