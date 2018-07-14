@@ -23,10 +23,71 @@ Library integrated and maintained by Paul Sokolovsky.
 uzlib library is licensed under Zlib license.
 
 
-The original "tinf" library README follows. NOTE: Some parts may no longer
-apply to uzlib.
+Decompressor features
+---------------------
+
+Handling of input (compressed) stream:
+
+* Can reside (fully) in memory.
+* Can be received, byte by byte, from an application-defined callback
+  function (which e.g. can read it from file or another I/O device).
+* Combination of the above: a chunk of input is buffered in memory,
+  when buffer is exhausted, the application callback is called to refill
+  it.
+
+Handling of output (decompressed) stream:
+
+* In-memory decompression, where output stream fully resides in memory.
+* Streaming decompression, which allows to process arbitrary-sized streams
+  (longer than available memory), but requires in-memory buffer for Deflate
+  dictionary window.
+* Application specifies number of output bytes it wants to decompress,
+  which can be as high as UINT_MAX to decompress everything into memory
+  at once, or as low as 1 to decompress byte by byte, or any other value
+  to decompress a chunk of that size.
+
+Note that in regard to input stream handling, uzlib employs callback-based,
+"pull-style" design. The control flow looks as follows:
+
+1. Application requests uzlib to decompress given number of bytes.
+2. uzlib performs decompression.
+3. If more input is needed to decompress given number of bytes, uzlib
+   calls back into application to provide more input bytes. (An
+   implication of this is that uzlib will always return given number of
+   output bytes, unless end of stream (or error) happens).
+
+The original Zlib library instead features "push-style" design:
+
+1. An application prepares arbitrary number of input bytes in a buffer,
+   and free space in output buffer, and calls Zlib with these buffers.
+2. Zlib tries to decode as much as possible input and produce as much
+   as possible output. It returns back to the application if input
+   buffer is exhausted, or output buffer is full, whatever happens
+   first.
+
+Currently, uzlib doesn't support push-style operation a-la Zlib.
+
+Compressor features
+-------------------
+
+Compressor uses very basic implementation of LZ77 algorithm using hash
+table to find repeating substrings. The size of the hash table (on which
+compression efficiency depends) is currently hardcoded at the compile-time.
+Likewise, the size of LZ77 dictionary is also hardcoded at compile time.
+Both settings should be made runtime-configurable. The hash table is
+allocated on the stack, instead it should be allocated by user and passed
+as an argument to the function (dependency injection pattern).
+
+Currently, compressor doesn't support streaming operation, both input and
+output must reside in memory. Neither it supports incremental operation,
+entire input buffer is compressed at once with a single call to uzlib.
 
 
+Original tinf library README
+============================
+
+For reference, the original "tinf" library README follows. NOTE: Some
+parts may no longer apply to uzlib.
 
 tinf - tiny inflate library
 ===========================
