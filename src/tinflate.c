@@ -35,6 +35,15 @@
 #include <assert.h>
 #include "tinf.h"
 
+#define UZLIB_DUMP_ARRAY(heading, arr, size) \
+    { \
+        printf("%s", heading); \
+        for (int i = 0; i < size; ++i) { \
+            printf(" %d", (arr)[i]); \
+        } \
+        printf("\n"); \
+    }
+
 uint32_t tinf_get_le_uint32(TINF_DATA *d);
 uint32_t tinf_get_be_uint32(TINF_DATA *d);
 
@@ -149,6 +158,10 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
    /* scan symbol lengths, and sum code length counts */
    for (i = 0; i < num; ++i) t->table[lengths[i]]++;
 
+   #if UZLIB_CONF_DEBUG_LOG >= 2
+   UZLIB_DUMP_ARRAY("codelen counts:", t->table, TINF_ARRAY_SIZE(t->table));
+   #endif
+
    t->table[0] = 0;
 
    /* compute offset table for distribution sort */
@@ -157,6 +170,10 @@ static void tinf_build_tree(TINF_TREE *t, const unsigned char *lengths, unsigned
       offs[i] = sum;
       sum += t->table[i];
    }
+
+   #if UZLIB_CONF_DEBUG_LOG >= 2
+   UZLIB_DUMP_ARRAY("codelen offsets:", offs, TINF_ARRAY_SIZE(offs));
+   #endif
 
    /* create code->symbol translation table (symbols sorted by code) */
    for (i = 0; i < num; ++i)
@@ -353,6 +370,13 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
          lengths[num++] = fill_value;
       }
    }
+
+   #if UZLIB_CONF_DEBUG_LOG >= 2
+   printf("lit code lengths (%d):", hlit);
+   UZLIB_DUMP_ARRAY("", lengths, hlit);
+   printf("dist code lengths (%d):", hdist);
+   UZLIB_DUMP_ARRAY("", lengths + hlit, hdist);
+   #endif
 
    /* build dynamic trees */
    tinf_build_tree(lt, lengths, hlit);
