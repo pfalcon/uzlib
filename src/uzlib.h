@@ -71,12 +71,12 @@ struct uzlib_uncomp {
     unsigned int tag;
     unsigned int bitcount;
 
-    /* Buffer start */
+    /* Destination (output) buffer start */
     unsigned char *dest_start;
-    /* Remaining bytes in buffer */
-    unsigned int dest_size;
-    /* Current pointer in buffer */
+    /* Current pointer in dest buffer */
     unsigned char *dest;
+    /* Pointer past the end of the dest buffer, similar to source_limit */
+    unsigned char *dest_limit;
 
     /* Accumulating checksum */
     unsigned int checksum;

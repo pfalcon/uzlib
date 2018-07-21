@@ -539,7 +539,7 @@ void uzlib_uncompress_init(TINF_DATA *d, void *dict, unsigned int dictLen)
    d->curlen = 0;
 }
 
-/* inflate next d->destSize output bytes from compressed stream */
+/* inflate next output bytes from compressed stream */
 int uzlib_uncompress(TINF_DATA *d)
 {
     do {
@@ -596,12 +596,12 @@ next_blk:
             return res;
         }
 
-    } while (--d->destSize);
+    } while (d->dest < d->dest_limit);
 
     return TINF_OK;
 }
 
-/* inflate next d->destSize output bytes from compressed stream, updating
+/* inflate next output bytes from compressed stream, updating
    checksum, and at the end of stream, verify it */
 int uzlib_uncompress_chksum(TINF_DATA *d)
 {
