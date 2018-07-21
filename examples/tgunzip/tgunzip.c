@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
     while (dlen) {
         unsigned int chunk_len = dlen < OUT_CHUNK_SIZE ? dlen : OUT_CHUNK_SIZE;
-        d.dest_size = chunk_len;
+        d.dest_limit = d.dest + chunk_len;
         res = uzlib_uncompress_chksum(&d);
         dlen -= chunk_len;
         if (res != TINF_OK) {
