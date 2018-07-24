@@ -382,6 +382,13 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
    UZLIB_DUMP_ARRAY("", lengths + hlit, hdist);
    #endif
 
+   #if UZLIB_CONF_PARANOID_CHECKS
+   /* Check that there's "end of block" symbol */
+   if (lengths[256] == 0) {
+      return TINF_DATA_ERROR;
+   }
+   #endif
+
    /* build dynamic trees */
    tinf_build_tree(lt, lengths, hlit);
    tinf_build_tree(dt, lengths + hlit, hdist);
