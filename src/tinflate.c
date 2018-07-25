@@ -293,9 +293,11 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
    } while (cur >= 0);
 
    sum += cur;
+   #if UZLIB_CONF_PARANOID_CHECKS
    if (sum < 0 || sum >= TINF_ARRAY_SIZE(t->trans)) {
       return TINF_DATA_ERROR;
    }
+   #endif
 
    return t->trans[sum];
 }
