@@ -99,7 +99,7 @@ void uzlib_compress(void *data, const uint8_t *src, unsigned slen)
             src += MIN_MATCH;
             const uint8_t *m = subs + MIN_MATCH;
             int len = MIN_MATCH;
-            while (*src == *m && len < MAX_MATCH) {
+            while (*src == *m && len < MAX_MATCH && src < top) {
                 src++; m++; len++;
             }
             copy(data, src - len - subs, len);
