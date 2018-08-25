@@ -2,7 +2,7 @@
  * tgzip  -  gzip compressor example
  *
  * Copyright (c) 2003 by Joergen Ibsen / Jibz
- * Copyright (c) 2014-2016 by Paul Sokolovsky
+ * Copyright (c) 2014-2018 by Paul Sokolovsky
  *
  * http://www.ibsensoftware.com/
  *
@@ -32,10 +32,10 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 #include "uzlib.h"
-#include "defl_static.h"
 
 void exit_error(const char *what)
 {
@@ -84,12 +84,18 @@ int main(int argc, char *argv[])
 
     /* -- compress data -- */
 
-    struct Outbuf out = {0};
-    zlib_start_block(&out);
-    uzlib_compress(&out, source, len);
-    zlib_finish_block(&out);
+    struct uzlib_comp comp = {0};
+    comp.dict_size = 32768;
+    comp.hash_bits = 12;
+    size_t hash_size = sizeof(uzlib_hash_entry_t) * (1 << comp.hash_bits);
+    comp.hash_table = malloc(hash_size);
+    memset(comp.hash_table, 0, hash_size);
 
-    printf("compressed to %u raw bytes\n", out.outlen);
+    zlib_start_block(&comp.out);
+    uzlib_compress(&comp, source, len);
+    zlib_finish_block(&comp.out);
+
+    printf("compressed to %u raw bytes\n", comp.out.outlen);
 
     /* -- write output -- */
 
@@ -102,7 +108,7 @@ int main(int argc, char *argv[])
     putc(0x04, fout); // XFL
     putc(0x03, fout); // OS
 
-    fwrite(out.outbuf, 1, out.outlen, fout);
+    fwrite(comp.out.outbuf, 1, comp.out.outlen, fout);
 
     unsigned crc = ~uzlib_crc32(source, len, ~0);
     fwrite(&crc, sizeof(crc), 1, fout);
