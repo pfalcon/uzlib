@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "defl_static.h"
+
 #include "uzlib_conf.h"
 #if UZLIB_CONF_DEBUG_LOG
 #include <stdio.h>
@@ -117,7 +119,17 @@ int TINFCC uzlib_gzip_parse_header(TINF_DATA *d);
 
 /* Compression API */
 
-void TINFCC uzlib_compress(void *data, const uint8_t *src, unsigned slen);
+typedef const uint8_t *uzlib_hash_entry_t;
+
+struct uzlib_comp {
+    struct Outbuf out;
+
+    uzlib_hash_entry_t *hash_table;
+    unsigned int hash_bits;
+    unsigned int dict_size;
+};
+
+void TINFCC uzlib_compress(struct uzlib_comp *c, const uint8_t *src, unsigned slen);
 
 /* Checksum API */
 

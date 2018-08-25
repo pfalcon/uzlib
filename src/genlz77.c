@@ -30,23 +30,33 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include "defl_static.h"
+#include "uzlib.h"
 
+#if 0
 #define HASH_BITS 12
+#else
+#define HASH_BITS data->hash_bits
+#endif
+
 #define HASH_SIZE (1<<HASH_BITS)
 
 /* Minimum and maximum length of matches to look for, inclusive */
 #define MIN_MATCH 3
 #define MAX_MATCH 258
+
 /* Max offset of the match to look for, inclusive */
+#if 0
 #define MAX_OFFSET 32768
+#else
+#define MAX_OFFSET data->dict_size
+#endif
 
 /* Hash function can be defined as macro or as inline function */
 
 /*#define HASH(p) (p[0] + p[1] + p[2])*/
 
 /* This is hash function from liblzf */
-static inline int HASH(const uint8_t *p) {
+static inline int HASH(struct uzlib_comp *data, const uint8_t *p) {
     int v = (p[0] << 16) | (p[1] << 8) | p[2];
     int hash = ((v >> (3*8 - HASH_BITS)) - v) & (HASH_SIZE - 1);
     return hash;
@@ -85,14 +95,12 @@ static inline void copy(void *data, unsigned offset, unsigned len)
 #endif
 
 
-void uzlib_compress(void *data, const uint8_t *src, unsigned slen)
+void uzlib_compress(struct uzlib_comp *data, const uint8_t *src, unsigned slen)
 {
-    const uint8_t *hashtable[HASH_SIZE] = {0};
-
     const uint8_t *top = src + slen - MIN_MATCH;
     while (src < top) {
-        int h = HASH(src);
-        const uint8_t **bucket = &hashtable[h & (HASH_SIZE - 1)];
+        int h = HASH(data, src);
+        const uint8_t **bucket = &data->hash_table[h & (HASH_SIZE - 1)];
         const uint8_t *subs = *bucket;
         *bucket = src;
         if (subs && src > subs && (src - subs) <= MAX_OFFSET && !memcmp(src, subs, MIN_MATCH)) {
