@@ -31,6 +31,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <assert.h>
 #include "defl_static.h"
@@ -112,7 +113,7 @@ static const unsigned char mirrorbytes[256] = {
 
 typedef struct {
     short code, extrabits;
-    int min, max;
+    uint16_t min, max;
 } coderecord;
 
 static const coderecord lencodes[] = {
