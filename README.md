@@ -82,6 +82,34 @@ Currently, compressor doesn't support streaming operation, both input and
 output must reside in memory. Neither it supports incremental operation,
 entire input buffer is compressed at once with a single call to uzlib.
 
+Binary sizes
+------------
+
+To give an impression of code/data sizes of uzlib, the following figures
+are provided. Numbers for *.o files are code sizes of individual
+components (tinflate.o is decompressor, genlz77.o and defl_static.o -
+compressor), and TINF_DATA is the size of the corresponding data
+structure. These numbers are provided for different architectures,
+with default uzlib configuration, and with compilers/their options
+as specified.
+
+```
+gcc -m32 -Os
+gcc (Ubuntu 7.3.0-27ubuntu1~18.04) 7.3.0
+2881 src/tinflate.o
+381 src/genlz77.o
+2129 src/defl_static.o
+1284 TINF_DATA
+
+arm-none-eabi-gcc -mthumb -mcpu=cortex-m4 -Os
+arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 7-2017-q4-major) 7.2.1 20170904 (release) [ARM/embedded-7-branch revision 255204]
+1620 src/tinflate.o
+188 src/genlz77.o
+1561 src/defl_static.o
+1284 TINF_DATA
+```
+
+---
 
 Original tinf library README
 ============================
