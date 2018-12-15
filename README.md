@@ -98,14 +98,14 @@ gcc -m32 -Os
 gcc (Ubuntu 7.3.0-27ubuntu1~18.04) 7.3.0
 2881 src/tinflate.o
 381 src/genlz77.o
-2129 src/defl_static.o
+1891 src/defl_static.o
 1284 TINF_DATA
 
 arm-none-eabi-gcc -mthumb -mcpu=cortex-m4 -Os
 arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 7-2017-q4-major) 7.2.1 20170904 (release) [ARM/embedded-7-branch revision 255204]
 1620 src/tinflate.o
 188 src/genlz77.o
-1561 src/defl_static.o
+1309 src/defl_static.o
 1284 TINF_DATA
 ```
 
