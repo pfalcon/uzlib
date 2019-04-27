@@ -114,9 +114,14 @@ static const unsigned char mirrorbytes[256] = {
 typedef struct {
     short code, extrabits;
     uint16_t min, max;
-} coderecord;
+} len_coderecord;
 
-static const coderecord lencodes[] = {
+typedef struct {
+    uint8_t code, extrabits;
+    uint16_t min, max;
+} dist_coderecord;
+
+static const len_coderecord lencodes[] = {
     {257, 0, 3, 3},
     {258, 0, 4, 4},
     {259, 0, 5, 5},
@@ -148,7 +153,7 @@ static const coderecord lencodes[] = {
     {285, 0, 258, 258},
 };
 
-static const coderecord distcodes[] = {
+static const dist_coderecord distcodes[] = {
     {0, 0, 1, 1},
     {1, 0, 2, 2},
     {2, 0, 3, 3},
@@ -202,7 +207,8 @@ void zlib_literal(struct Outbuf *out, unsigned char c)
 
 void zlib_match(struct Outbuf *out, int distance, int len)
 {
-    const coderecord *d, *l;
+    const dist_coderecord *d;
+    const len_coderecord *l;
     int i, j, k;
 
     assert(!out->comp_disabled);
