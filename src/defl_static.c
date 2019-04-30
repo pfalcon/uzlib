@@ -113,7 +113,7 @@ static const unsigned char mirrorbytes[256] = {
 
 typedef struct {
     short code, extrabits;
-    uint16_t min, max;
+    uint8_t min, max;
 } len_coderecord;
 
 typedef struct {
@@ -121,36 +121,39 @@ typedef struct {
     uint16_t min, max;
 } dist_coderecord;
 
+#define TO_LCODE(x, y) x - 3, y - 3
+#define FROM_LCODE(x) (x + 3)
+
 static const len_coderecord lencodes[] = {
-    {257, 0, 3, 3},
-    {258, 0, 4, 4},
-    {259, 0, 5, 5},
-    {260, 0, 6, 6},
-    {261, 0, 7, 7},
-    {262, 0, 8, 8},
-    {263, 0, 9, 9},
-    {264, 0, 10, 10},
-    {265, 1, 11, 12},
-    {266, 1, 13, 14},
-    {267, 1, 15, 16},
-    {268, 1, 17, 18},
-    {269, 2, 19, 22},
-    {270, 2, 23, 26},
-    {271, 2, 27, 30},
-    {272, 2, 31, 34},
-    {273, 3, 35, 42},
-    {274, 3, 43, 50},
-    {275, 3, 51, 58},
-    {276, 3, 59, 66},
-    {277, 4, 67, 82},
-    {278, 4, 83, 98},
-    {279, 4, 99, 114},
-    {280, 4, 115, 130},
-    {281, 5, 131, 162},
-    {282, 5, 163, 194},
-    {283, 5, 195, 226},
-    {284, 5, 227, 257},
-    {285, 0, 258, 258},
+    {257, 0, TO_LCODE(3, 3)},
+    {258, 0, TO_LCODE(4, 4)},
+    {259, 0, TO_LCODE(5, 5)},
+    {260, 0, TO_LCODE(6, 6)},
+    {261, 0, TO_LCODE(7, 7)},
+    {262, 0, TO_LCODE(8, 8)},
+    {263, 0, TO_LCODE(9, 9)},
+    {264, 0, TO_LCODE(10, 10)},
+    {265, 1, TO_LCODE(11, 12)},
+    {266, 1, TO_LCODE(13, 14)},
+    {267, 1, TO_LCODE(15, 16)},
+    {268, 1, TO_LCODE(17, 18)},
+    {269, 2, TO_LCODE(19, 22)},
+    {270, 2, TO_LCODE(23, 26)},
+    {271, 2, TO_LCODE(27, 30)},
+    {272, 2, TO_LCODE(31, 34)},
+    {273, 3, TO_LCODE(35, 42)},
+    {274, 3, TO_LCODE(43, 50)},
+    {275, 3, TO_LCODE(51, 58)},
+    {276, 3, TO_LCODE(59, 66)},
+    {277, 4, TO_LCODE(67, 82)},
+    {278, 4, TO_LCODE(83, 98)},
+    {279, 4, TO_LCODE(99, 114)},
+    {280, 4, TO_LCODE(115, 130)},
+    {281, 5, TO_LCODE(131, 162)},
+    {282, 5, TO_LCODE(163, 194)},
+    {283, 5, TO_LCODE(195, 226)},
+    {284, 5, TO_LCODE(227, 257)},
+    {285, 0, TO_LCODE(258, 258)},
 };
 
 static const dist_coderecord distcodes[] = {
@@ -238,9 +241,9 @@ void zlib_match(struct Outbuf *out, int distance, int len)
         while (1) {
             assert(j - i >= 2);
             k = (j + i) / 2;
-            if (thislen < lencodes[k].min)
+            if (thislen < FROM_LCODE(lencodes[k].min))
                 j = k;
-            else if (thislen > lencodes[k].max)
+            else if (thislen > FROM_LCODE(lencodes[k].max))
                 i = k;
             else {
                 l = &lencodes[k];
@@ -263,7 +266,7 @@ void zlib_match(struct Outbuf *out, int distance, int len)
          * Transmit the extra bits.
          */
         if (l->extrabits)
-            outbits(out, thislen - l->min, l->extrabits);
+            outbits(out, thislen - FROM_LCODE(l->min), l->extrabits);
 
         /*
          * Binary-search to find which distance code we're
