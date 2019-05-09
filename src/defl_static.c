@@ -112,7 +112,7 @@ static const unsigned char mirrorbytes[256] = {
 };
 
 typedef struct {
-    short code, extrabits;
+    uint8_t extrabits;
     uint8_t min, max;
 } len_coderecord;
 
@@ -125,35 +125,35 @@ typedef struct {
 #define FROM_LCODE(x) (x + 3)
 
 static const len_coderecord lencodes[] = {
-    {257, 0, TO_LCODE(3, 3)},
-    {258, 0, TO_LCODE(4, 4)},
-    {259, 0, TO_LCODE(5, 5)},
-    {260, 0, TO_LCODE(6, 6)},
-    {261, 0, TO_LCODE(7, 7)},
-    {262, 0, TO_LCODE(8, 8)},
-    {263, 0, TO_LCODE(9, 9)},
-    {264, 0, TO_LCODE(10, 10)},
-    {265, 1, TO_LCODE(11, 12)},
-    {266, 1, TO_LCODE(13, 14)},
-    {267, 1, TO_LCODE(15, 16)},
-    {268, 1, TO_LCODE(17, 18)},
-    {269, 2, TO_LCODE(19, 22)},
-    {270, 2, TO_LCODE(23, 26)},
-    {271, 2, TO_LCODE(27, 30)},
-    {272, 2, TO_LCODE(31, 34)},
-    {273, 3, TO_LCODE(35, 42)},
-    {274, 3, TO_LCODE(43, 50)},
-    {275, 3, TO_LCODE(51, 58)},
-    {276, 3, TO_LCODE(59, 66)},
-    {277, 4, TO_LCODE(67, 82)},
-    {278, 4, TO_LCODE(83, 98)},
-    {279, 4, TO_LCODE(99, 114)},
-    {280, 4, TO_LCODE(115, 130)},
-    {281, 5, TO_LCODE(131, 162)},
-    {282, 5, TO_LCODE(163, 194)},
-    {283, 5, TO_LCODE(195, 226)},
-    {284, 5, TO_LCODE(227, 257)},
-    {285, 0, TO_LCODE(258, 258)},
+    {0, TO_LCODE(3, 3)},
+    {0, TO_LCODE(4, 4)},
+    {0, TO_LCODE(5, 5)},
+    {0, TO_LCODE(6, 6)},
+    {0, TO_LCODE(7, 7)},
+    {0, TO_LCODE(8, 8)},
+    {0, TO_LCODE(9, 9)},
+    {0, TO_LCODE(10, 10)},
+    {1, TO_LCODE(11, 12)},
+    {1, TO_LCODE(13, 14)},
+    {1, TO_LCODE(15, 16)},
+    {1, TO_LCODE(17, 18)},
+    {2, TO_LCODE(19, 22)},
+    {2, TO_LCODE(23, 26)},
+    {2, TO_LCODE(27, 30)},
+    {2, TO_LCODE(31, 34)},
+    {3, TO_LCODE(35, 42)},
+    {3, TO_LCODE(43, 50)},
+    {3, TO_LCODE(51, 58)},
+    {3, TO_LCODE(59, 66)},
+    {4, TO_LCODE(67, 82)},
+    {4, TO_LCODE(83, 98)},
+    {4, TO_LCODE(99, 114)},
+    {4, TO_LCODE(115, 130)},
+    {5, TO_LCODE(131, 162)},
+    {5, TO_LCODE(163, 194)},
+    {5, TO_LCODE(195, 226)},
+    {5, TO_LCODE(227, 257)},
+    {0, TO_LCODE(258, 258)},
 };
 
 static const dist_coderecord distcodes[] = {
@@ -213,6 +213,7 @@ void zlib_match(struct Outbuf *out, int distance, int len)
     const dist_coderecord *d;
     const len_coderecord *l;
     int i, j, k;
+    int lcode;
 
     assert(!out->comp_disabled);
 
@@ -251,15 +252,17 @@ void zlib_match(struct Outbuf *out, int distance, int len)
             }
         }
 
+        lcode = l - lencodes + 257;
+
         /*
          * Transmit the length code. 256-279 are seven bits
          * starting at 0000000; 280-287 are eight bits starting at
          * 11000000.
          */
-        if (l->code <= 279) {
-            outbits(out, mirrorbytes[(l->code - 256) * 2], 7);
+        if (lcode <= 279) {
+            outbits(out, mirrorbytes[(lcode - 256) * 2], 7);
         } else {
-            outbits(out, mirrorbytes[0xc0 - 280 + l->code], 8);
+            outbits(out, mirrorbytes[0xc0 - 280 + lcode], 8);
         }
 
         /*
