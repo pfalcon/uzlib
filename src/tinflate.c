@@ -61,6 +61,8 @@ unsigned short length_base[30];
 unsigned char dist_bits[30];
 unsigned short dist_base[30];
 
+unsigned char clcidx[19];
+
 #else
 
 const unsigned char length_bits[30] = {
@@ -89,14 +91,14 @@ const unsigned short dist_base[30] = {
    4097, 6145, 8193, 12289, 16385, 24577
 };
 
-#endif
-
 /* special ordering of code length codes */
 const unsigned char clcidx[] = {
    16, 17, 18, 0, 8, 7, 9, 6,
    10, 5, 11, 4, 12, 3, 13, 2,
    14, 1, 15
 };
+
+#endif
 
 /* ----------------------- *
  * -- utility functions -- *
@@ -532,6 +534,27 @@ void uzlib_init(void)
    /* fix a special case */
    length_bits[28] = 0;
    length_base[28] = 258;
+
+   /* Set the values in code to allow RODATA-less environment. */
+   clcidx[0] = 16;
+   clcidx[1] = 17;
+   clcidx[2] = 18;
+   clcidx[3] = 0;
+   clcidx[4] = 8;
+   clcidx[5] = 7;
+   clcidx[6] = 9;
+   clcidx[7] = 6;
+   clcidx[8] = 10;
+   clcidx[9] = 5;
+   clcidx[10] = 11;
+   clcidx[11] = 4;
+   clcidx[12] = 12;
+   clcidx[13] = 3;
+   clcidx[14] = 13;
+   clcidx[15] = 2;
+   clcidx[16] = 14;
+   clcidx[17] = 1;
+   clcidx[18] = 15;
 #endif
 }
 
