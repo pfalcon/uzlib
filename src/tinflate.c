@@ -33,6 +33,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 #include "tinf.h"
 
 #define UZLIB_DUMP_ARRAY(heading, arr, size) \
@@ -402,7 +403,7 @@ static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
  * -- block inflate functions -- *
  * ----------------------------- */
 
-/* given a stream and two trees, inflate next byte of output */
+/* given a stream and two trees, inflate next chunk of output (a byte or more) */
 static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
     if (d->curlen == 0) {
@@ -478,8 +479,20 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             d->lzOff = 0;
         }
     } else {
+        #if UZLIB_CONF_USE_MEMCPY
+        /* copy as much as possible, in one memcpy() call */
+        unsigned int to_copy = d->curlen, dest_len = d->dest_limit - d->dest;
+        if (to_copy > dest_len) {
+            to_copy = dest_len;
+        }
+        memcpy(d->dest, d->dest + d->lzOff, to_copy);
+        d->dest += to_copy;
+        d->curlen -= to_copy;
+        return TINF_OK;
+        #else
         d->dest[0] = d->dest[d->lzOff];
         d->dest++;
+        #endif
     }
     d->curlen--;
     return TINF_OK;
