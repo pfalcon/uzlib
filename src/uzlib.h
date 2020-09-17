@@ -123,9 +123,19 @@ struct uzlib_uncomp {
 
 #include "tinf_compat.h"
 
+
+#ifndef TINF_DEST_PUTC
+#define TINF_DEST_PUTC(c) do { *d->dest = c; } while(0)
+#endif
+
+#ifndef TINF_DEST_GETC
+#define TINF_DEST_GETC(addr) ({ unsigned char ret = *(addr); ret; })
+#endif
+
 #define TINF_PUT(d, c) \
     { \
-        *d->dest++ = c; \
+        TINF_DEST_PUTC(c); \
+        d->dest++; \
         if (d->dict_ring) { d->dict_ring[d->dict_idx++] = c; if (d->dict_idx == d->dict_size) d->dict_idx = 0; } \
     }
 

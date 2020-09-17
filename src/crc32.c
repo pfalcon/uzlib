@@ -53,7 +53,7 @@ uint32_t uzlib_crc32(const void *data, unsigned int length, uint32_t crc)
 
    for (i = 0; i < length; ++i)
    {
-      crc ^= buf[i];
+      crc ^= TINF_DEST_GETC(buf+i);
       crc = tinf_crc32tab[crc & 0x0f] ^ (crc >> 4);
       crc = tinf_crc32tab[crc & 0x0f] ^ (crc >> 4);
    }

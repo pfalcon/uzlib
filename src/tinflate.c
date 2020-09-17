@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <string.h>
 #include "tinf.h"
+#include "uzlib_conf.h"
 
 #define UZLIB_DUMP_ARRAY(heading, arr, size) \
     { \
@@ -490,7 +491,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         d->curlen -= to_copy;
         return TINF_OK;
         #else
-        d->dest[0] = d->dest[d->lzOff];
+        TINF_DEST_PUTC(TINF_DEST_GETC(d->dest + d->lzOff));
         d->dest++;
         #endif
     }

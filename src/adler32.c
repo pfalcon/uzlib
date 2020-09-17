@@ -55,18 +55,18 @@ uint32_t uzlib_adler32(const void *data, unsigned int length, uint32_t prev_sum 
 
       for (i = k / 16; i; --i, buf += 16)
       {
-         s1 += buf[0];  s2 += s1; s1 += buf[1];  s2 += s1;
-         s1 += buf[2];  s2 += s1; s1 += buf[3];  s2 += s1;
-         s1 += buf[4];  s2 += s1; s1 += buf[5];  s2 += s1;
-         s1 += buf[6];  s2 += s1; s1 += buf[7];  s2 += s1;
+         s1 += TINF_DEST_GETC(buf+0);  s2 += s1; s1 += TINF_DEST_GETC(buf + 1);  s2 += s1;
+         s1 += TINF_DEST_GETC(buf+2);  s2 += s1; s1 += TINF_DEST_GETC(buf + 3);  s2 += s1;
+         s1 += TINF_DEST_GETC(buf+4);  s2 += s1; s1 += TINF_DEST_GETC(buf + 5);  s2 += s1;
+         s1 += TINF_DEST_GETC(buf+6);  s2 += s1; s1 += TINF_DEST_GETC(buf + 7);  s2 += s1;
 
-         s1 += buf[8];  s2 += s1; s1 += buf[9];  s2 += s1;
-         s1 += buf[10]; s2 += s1; s1 += buf[11]; s2 += s1;
-         s1 += buf[12]; s2 += s1; s1 += buf[13]; s2 += s1;
-         s1 += buf[14]; s2 += s1; s1 += buf[15]; s2 += s1;
+         s1 += TINF_DEST_GETC(buf+8);  s2 += s1; s1 += TINF_DEST_GETC(buf + 9);  s2 += s1;
+         s1 += TINF_DEST_GETC(buf+10); s2 += s1; s1 += TINF_DEST_GETC(buf + 11); s2 += s1;
+         s1 += TINF_DEST_GETC(buf+12); s2 += s1; s1 += TINF_DEST_GETC(buf + 13); s2 += s1;
+         s1 += TINF_DEST_GETC(buf+14); s2 += s1; s1 += TINF_DEST_GETC(buf + 15); s2 += s1;
       }
 
-      for (i = k % 16; i; --i) { s1 += *buf++; s2 += s1; }
+      for (i = k % 16; i; --i) { s1 += TINF_DEST_GETC(buf++); s2 += s1; }
 
       s1 %= A32_BASE;
       s2 %= A32_BASE;
