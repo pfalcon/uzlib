@@ -18,7 +18,7 @@ uzlib is based on:
 
 Library integrated and maintained by Paul Sokolovsky.
 
-(c) 2014-2018 Paul Sokolovsky
+(c) 2014-2020 Paul Sokolovsky
 
 uzlib library is licensed under Zlib license.
 

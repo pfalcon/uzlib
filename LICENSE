@@ -14,7 +14,7 @@ uzlib - Deflate/Zlib-compatible LZ77 compression/decompression library
 
 Copyright (c) 2003 Joergen Ibsen
 Copyright (c) 1997-2014 Simon Tatham
-Copyright (c) 2014-2018 Paul Sokolovsky
+Copyright (c) 2014-2020 Paul Sokolovsky
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
