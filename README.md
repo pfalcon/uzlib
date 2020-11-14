@@ -95,17 +95,17 @@ as specified.
 
 ```
 gcc -m32 -Os
-gcc (Ubuntu 7.3.0-27ubuntu1~18.04) 7.3.0
-2881 src/tinflate.o
+gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
+2891 src/tinflate.o
 381 src/genlz77.o
-1891 src/defl_static.o
+1685 src/defl_static.o
 1284 TINF_DATA
 
 arm-none-eabi-gcc -mthumb -mcpu=cortex-m4 -Os
-arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 7-2017-q4-major) 7.2.1 20170904 (release) [ARM/embedded-7-branch revision 255204]
+arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 9-2019-q4-major) 9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]
 1620 src/tinflate.o
-188 src/genlz77.o
-1309 src/defl_static.o
+180 src/genlz77.o
+1131 src/defl_static.o
 1284 TINF_DATA
 ```
 
