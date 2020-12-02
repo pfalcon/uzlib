@@ -39,6 +39,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "defl_static.h"
 
 #include "uzlib_conf.h"
@@ -53,10 +57,6 @@
  #else
   #define TINFCC
  #endif
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /* ok status, more data produced */
