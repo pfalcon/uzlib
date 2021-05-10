@@ -82,6 +82,21 @@ Currently, compressor doesn't support streaming operation, both input and
 output must reside in memory. Neither it supports incremental operation,
 entire input buffer is compressed at once with a single call to uzlib.
 
+API and configuration
+---------------------
+
+The API is defined in the file [uzlib.h](src/uzlib.h) and should be largely
+self-describing. There are also examples implementing gzip-compatible
+compression and decompression applications in [examples/](examples/) for
+further reference. (You may also refer to the original `tinf` README
+below for additional information, but it's mostly provided for
+historical reference, and `uzlib` largely evolved beyond it).
+
+There are some compile-time options for the library, defined in
+the file [uzlib_conf.h](src/uzlib_conf.h). They can be altered directly
+in the file, or passed as the compiler options (`-DXXX=YYY`) when
+building library.
+
 Binary sizes
 ------------
 
