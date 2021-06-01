@@ -129,8 +129,11 @@ arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 9-2019-q4-major) 9.2.1 
 Original tinf library README
 ============================
 
-For reference, the original "tinf" library README follows. NOTE: Some
-parts may no longer apply to uzlib.
+*For historical reference and to provide proper credit, the original `tinf`
+library README follows. NOTE: Many parts no longer apply to `uzlib`. In
+particular, API is different, features supported are largely extended,
+and during decompression, there are checks to avoid erroneous/undefined
+behavior on incorrect Deflate bitstreams.*
 
 tinf - tiny inflate library
 ===========================
