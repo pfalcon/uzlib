@@ -72,11 +72,8 @@ Compressor features
 
 Compressor uses very basic implementation of LZ77 algorithm using hash
 table to find repeating substrings. The size of the hash table (on which
-compression efficiency depends) is currently hardcoded at the compile-time.
-Likewise, the size of LZ77 dictionary is also hardcoded at compile time.
-Both settings should be made runtime-configurable. The hash table is
-allocated on the stack, instead it should be allocated by user and passed
-as an argument to the function (dependency injection pattern).
+compression efficiency depends), pointer to the hashtable memory, and
+the size of LZ77 dictionary should be configured in `struct uzlib_comp`.
 
 Currently, compressor doesn't support streaming operation, both input and
 output must reside in memory. Neither it supports incremental operation,
