@@ -91,11 +91,11 @@ int main(int argc, char *argv[])
     comp.hash_table = malloc(hash_size);
     memset(comp.hash_table, 0, hash_size);
 
-    zlib_start_block(&comp.out);
+    zlib_start_block(&comp);
     uzlib_compress(&comp, source, len);
-    zlib_finish_block(&comp.out);
+    zlib_finish_block(&comp);
 
-    printf("compressed to %u raw bytes\n", comp.out.outlen);
+    printf("compressed to %u raw bytes\n", comp.outlen);
 
     /* -- write output -- */
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     putc(0x04, fout); // XFL
     putc(0x03, fout); // OS
 
-    fwrite(comp.out.outbuf, 1, comp.out.outlen, fout);
+    fwrite(comp.outbuf, 1, comp.outlen, fout);
 
     unsigned crc = ~uzlib_crc32(source, len, ~0);
     fwrite(&crc, sizeof(crc), 1, fout);
