@@ -34,6 +34,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
+#include "uzlib.h"
 #include "defl_static.h"
 
 #define snew(type) ( (type *) malloc(sizeof(type)) )
@@ -60,7 +61,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * having to transmit the trees.
  */
 
-void outbits(struct Outbuf *out, unsigned long bits, int nbits)
+void outbits(struct uzlib_comp *out, unsigned long bits, int nbits)
 {
     assert(out->noutbits + nbits <= 32);
     out->outbits |= bits << out->noutbits;
@@ -189,7 +190,7 @@ static const dist_coderecord distcodes[] = {
     {29, 13, 24577, 32768},
 };
 
-void zlib_literal(struct Outbuf *out, unsigned char c)
+void zlib_literal(struct uzlib_comp *out, unsigned char c)
 {
     if (out->comp_disabled) {
         /*
@@ -208,7 +209,7 @@ void zlib_literal(struct Outbuf *out, unsigned char c)
     }
 }
 
-void zlib_match(struct Outbuf *out, int distance, int len)
+void zlib_match(struct uzlib_comp *out, int distance, int len)
 {
     const dist_coderecord *d;
     const len_coderecord *l;
@@ -303,14 +304,14 @@ void zlib_match(struct Outbuf *out, int distance, int len)
     }
 }
 
-void zlib_start_block(struct Outbuf *out)
+void zlib_start_block(struct uzlib_comp *out)
 {
 //    outbits(out, 0x9C78, 16);
     outbits(out, 1, 1); /* Final block */
     outbits(out, 1, 2); /* Static huffman block */
 }
 
-void zlib_finish_block(struct Outbuf *out)
+void zlib_finish_block(struct uzlib_comp *out)
 {
     outbits(out, 0, 7); /* close block */
     outbits(out, 0, 7); /* Make sure all bits are flushed */
