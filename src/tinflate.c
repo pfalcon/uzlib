@@ -294,11 +294,9 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
    } while (cur >= 0);
 
    sum += cur;
-   #if UZLIB_CONF_PARANOID_CHECKS
    if (sum < 0 || sum >= TINF_ARRAY_SIZE(t->trans)) {
       return TINF_DATA_ERROR;
    }
-   #endif
 
    return t->trans[sum];
 }
@@ -410,6 +408,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         unsigned int offs;
         int dist;
         int sym = tinf_decode_symbol(d, lt);
+        if (sym < 0) return sym;
         //printf("huff sym: %02x\n", sym);
 
         if (d->eof) {
@@ -437,6 +436,7 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         d->curlen = tinf_read_bits(d, length_bits[sym], length_base[sym]);
 
         dist = tinf_decode_symbol(d, dt);
+        if (dist < 0) return dist;
         if (dist >= 30) {
             return TINF_DATA_ERROR;
         }
