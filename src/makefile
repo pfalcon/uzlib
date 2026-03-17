@@ -27,7 +27,7 @@ $(target): $(objects)
 	ranlib $@
 
 %.o : %.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -I. -c $<
 
 %.o : %.nas
 	nasm -o $@ -f elf -D_ELF_ -O3 -Inasm/ $<

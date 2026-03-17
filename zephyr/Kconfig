@@ -1,0 +1,41 @@
+# uzlib module configuration options
+
+config UZLIB
+	bool "Enable uzlib library"
+
+if UZLIB
+	
+config UZLIB_COMPRESS
+	bool "Enable compression"
+	default y
+	
+config UZLIB_DECOMPRESS
+	bool "Enable decompression"
+	default n
+	
+config UZLIB_DEBUG_LOG
+	int "Debug log level"
+	default 0
+	help
+	  	Debug logging level 0, 1, 2, etc.
+	
+config UZLIB_PARANOID_CHECKS
+	bool "Enable paranoid checks"
+	default n
+	help
+		Perform extra checks on the input stream, even if they aren't proven
+		to be strictly required (== lack of them wasn't proven to lead to
+		crashes).
+	
+config UZLIB_USE_MEMCPY
+	bool "Enable memcpy"
+	default n
+	help
+	  	Use memcpy() for copying data out of LZ window or uncompressed blocks,
+		instead of doing this byte by byte. For well-compressed data, this
+		may noticeably increase decompression speed. But for less compressed,
+		it can actually deteriorate it (due to the fact that many memcpy()
+		implementations are optimized for large blocks of data, and have
+		too much overhead for short strings of just a few bytes).
+	
+endif # UZLIB

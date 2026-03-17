@@ -43,7 +43,7 @@
 extern "C" {
 #endif
 
-#include "uzlib_conf.h"
+#include <uzlib_conf.h>
 #if UZLIB_CONF_DEBUG_LOG
 #include <stdio.h>
 #endif
