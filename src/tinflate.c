@@ -306,8 +306,12 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 /* given a data stream, decode dynamic trees from it */
 static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
+#if UZLIB_CONF_LENGTHS_IN_STATE
+   unsigned char *lengths = d->lengths;
+#else
    /* code lengths for 288 literal/len symbols and 32 dist symbols */
    unsigned char lengths[288+32];
+#endif
    unsigned int hlit, hdist, hclen, hlimit;
    unsigned int i, num, length;
 
@@ -416,6 +420,10 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
             return TINF_DATA_ERROR;
         }
 
+        if (sym < 0) {
+            return sym;
+        }
+
         /* literal byte */
         if (sym < 256) {
             TINF_PUT(d, sym);
@@ -437,6 +445,9 @@ static int tinf_inflate_block_data(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
         d->curlen = tinf_read_bits(d, length_bits[sym], length_base[sym]);
 
         dist = tinf_decode_symbol(d, dt);
+        if (dist < 0) {
+            return dist;
+        }
         if (dist >= 30) {
             return TINF_DATA_ERROR;
         }

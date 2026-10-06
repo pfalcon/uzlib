@@ -29,4 +29,11 @@
 #define UZLIB_CONF_USE_MEMCPY 0
 #endif
 
+#ifndef UZLIB_CONF_LENGTHS_IN_STATE
+/* Keep the code lengths scratch buffer used to decode dynamic trees
+   (320 bytes) in the decompression state instead of on the stack. Useful
+   for small stacks, at the cost of a larger TINF_DATA. */
+#define UZLIB_CONF_LENGTHS_IN_STATE 0
+#endif
+
 #endif /* UZLIB_CONF_H_INCLUDED */
