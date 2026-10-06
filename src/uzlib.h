@@ -117,6 +117,11 @@ struct uzlib_uncomp {
 
     TINF_TREE ltree; /* dynamic length/symbol tree */
     TINF_TREE dtree; /* dynamic distance tree */
+
+#if UZLIB_CONF_LENGTHS_IN_STATE
+    /* code lengths for 288 literal/len symbols and 32 dist symbols */
+    unsigned char lengths[288+32];
+#endif
 };
 
 #include "tinf_compat.h"

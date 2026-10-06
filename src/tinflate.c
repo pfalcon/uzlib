@@ -306,8 +306,12 @@ static int tinf_decode_symbol(TINF_DATA *d, TINF_TREE *t)
 /* given a data stream, decode dynamic trees from it */
 static int tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
 {
+#if UZLIB_CONF_LENGTHS_IN_STATE
+   unsigned char *lengths = d->lengths;
+#else
    /* code lengths for 288 literal/len symbols and 32 dist symbols */
    unsigned char lengths[288+32];
+#endif
    unsigned int hlit, hdist, hclen, hlimit;
    unsigned int i, num, length;
 
